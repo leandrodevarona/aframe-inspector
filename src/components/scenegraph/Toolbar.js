@@ -11,6 +11,8 @@ import Events from '../../lib/Events';
 import { saveBlob } from '../../lib/utils';
 import GLTFIcon from '../../../assets/gltf.svg';
 
+import SpinnerLoader from '../components/SpinnerLoader';
+
 function filterHelpers(scene, visible) {
   scene.traverse((o) => {
     if (o.userData.source === 'INSPECTOR') {
@@ -47,7 +49,8 @@ export default class Toolbar extends React.Component {
     super(props);
 
     this.state = {
-      isPlaying: false
+      isPlaying: false,
+      saveLoading: false
     };
   }
 
@@ -77,13 +80,15 @@ export default class Toolbar extends React.Component {
    * Try to write changes with aframe-inspector-watcher.
    */
   writeChanges = () => {
+    this.setState({ saveLoading: true });
+
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'http://localhost:51234/save');
+    xhr.open('PUT', '/scene/inspector/update');
     xhr.onerror = () => {
-      alert(
-        'aframe-watcher not running. This feature requires a companion service running locally. npm install aframe-watcher to save changes back to file. Read more at https://github.com/supermedium/aframe-watcher'
-      );
+      this.setState({ saveLoading: false });
+      alert('Save error. Method not alowed');
     };
+    xhr.onloadend = () => this.setState({ saveLoading: false });
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify(AFRAME.INSPECTOR.history.updates));
   };
@@ -142,7 +147,11 @@ export default class Toolbar extends React.Component {
             title={watcherTitle}
             onClick={this.writeChanges}
           >
-            <AwesomeIcon icon={faFloppyDisk} />
+            {this.state.saveLoading === true ? (
+              <SpinnerLoader />
+            ) : (
+              <AwesomeIcon icon={faFloppyDisk} />
+            )}
           </a>
           <div className="helpButtonContainer">
             <a className="button" title="Help" onClick={this.openHelpModal}>

@@ -2692,7 +2692,10 @@ class AddComponent extends (react__WEBPACK_IMPORTED_MODULE_0___default().Compone
    */
   getComponentsOptions() {
     const usedComponents = Object.keys(this.props.entity.components);
-    return Object.keys(AFRAME.components).filter(function (componentName) {
+    return Object.keys(AFRAME.components).filter(componentName => {
+      if (AFRAME.components[componentName].sceneOnly && !this.props.entity.isScene) {
+        return false;
+      }
       return AFRAME.components[componentName].multiple || usedComponents.indexOf(componentName) === -1;
     }).map(function (value) {
       return {
@@ -2923,17 +2926,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
-/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_8__);
-/* harmony import */ var _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @fortawesome/free-solid-svg-icons */ "./node_modules/@fortawesome/free-solid-svg-icons/index.mjs");
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @fortawesome/free-solid-svg-icons */ "./node_modules/@fortawesome/free-solid-svg-icons/index.mjs");
 /* harmony import */ var _AwesomeIcon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../AwesomeIcon */ "./src/components/AwesomeIcon.js");
 /* harmony import */ var _PropertyRow__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./PropertyRow */ "./src/components/components/PropertyRow.js");
 /* harmony import */ var _Collapsible__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Collapsible */ "./src/components/Collapsible.js");
 /* harmony import */ var clipboard_copy__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! clipboard-copy */ "./node_modules/clipboard-copy/index.js");
 /* harmony import */ var clipboard_copy__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(clipboard_copy__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var _lib_entity__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../lib/entity */ "./src/lib/entity.js");
-/* harmony import */ var _lib_Events__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../lib/Events */ "./src/lib/Events.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var _lib_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../lib/utils */ "./src/lib/utils.js");
+/* harmony import */ var _lib_Events__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../lib/Events */ "./src/lib/Events.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+
 
 
 
@@ -2951,10 +2956,10 @@ const isSingleProperty = AFRAME.schema.isSingleProperty;
  */
 class Component extends (react__WEBPACK_IMPORTED_MODULE_0___default().Component) {
   static propTypes = {
-    component: (prop_types__WEBPACK_IMPORTED_MODULE_8___default().any),
-    entity: (prop_types__WEBPACK_IMPORTED_MODULE_8___default().object),
-    isCollapsed: (prop_types__WEBPACK_IMPORTED_MODULE_8___default().bool),
-    name: (prop_types__WEBPACK_IMPORTED_MODULE_8___default().string)
+    component: (prop_types__WEBPACK_IMPORTED_MODULE_9___default().any),
+    entity: (prop_types__WEBPACK_IMPORTED_MODULE_9___default().object),
+    isCollapsed: (prop_types__WEBPACK_IMPORTED_MODULE_9___default().bool),
+    name: (prop_types__WEBPACK_IMPORTED_MODULE_9___default().string)
   };
   constructor(props) {
     super(props);
@@ -2972,10 +2977,10 @@ class Component extends (react__WEBPACK_IMPORTED_MODULE_0___default().Component)
     }
   };
   componentDidMount() {
-    _lib_Events__WEBPACK_IMPORTED_MODULE_6__["default"].on('entityupdate', this.onEntityUpdate);
+    _lib_Events__WEBPACK_IMPORTED_MODULE_7__["default"].on('entityupdate', this.onEntityUpdate);
   }
   componentWillUnmount() {
-    _lib_Events__WEBPACK_IMPORTED_MODULE_6__["default"].off('entityupdate', this.onEntityUpdate);
+    _lib_Events__WEBPACK_IMPORTED_MODULE_7__["default"].off('entityupdate', this.onEntityUpdate);
   }
   static getDerivedStateFromProps(props, state) {
     if (state.entity !== props.entity) {
@@ -2995,7 +3000,7 @@ class Component extends (react__WEBPACK_IMPORTED_MODULE_0___default().Component)
     event.stopPropagation();
     if (confirm('Do you really want to remove component `' + componentName + '`?')) {
       this.props.entity.removeAttribute(componentName);
-      _lib_Events__WEBPACK_IMPORTED_MODULE_6__["default"].emit('componentremove', {
+      _lib_Events__WEBPACK_IMPORTED_MODULE_7__["default"].emit('componentremove', {
         entity: this.props.entity,
         component: componentName
       });
@@ -3010,7 +3015,7 @@ class Component extends (react__WEBPACK_IMPORTED_MODULE_0___default().Component)
     if (isSingleProperty(componentData.schema)) {
       const componentName = this.props.name;
       const schema = AFRAME.components[componentName.split('__')[0]].schema;
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_PropertyRow__WEBPACK_IMPORTED_MODULE_2__["default"], {
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_PropertyRow__WEBPACK_IMPORTED_MODULE_2__["default"], {
         name: componentName,
         schema: schema,
         data: componentData.data,
@@ -3019,26 +3024,7 @@ class Component extends (react__WEBPACK_IMPORTED_MODULE_0___default().Component)
         entity: this.props.entity
       }, componentName);
     }
-    return Object.keys(componentData.schema).sort().filter(propertyName => {
-      if (!componentData.schema[propertyName].if) {
-        return true;
-      }
-      let showProperty = true;
-      for (const [conditionKey, conditionValue] of Object.entries(componentData.schema[propertyName].if)) {
-        if (Array.isArray(conditionValue)) {
-          if (conditionValue.indexOf(componentData.data[conditionKey]) === -1) {
-            showProperty = false;
-            break;
-          }
-        } else {
-          if (conditionValue !== componentData.data[conditionKey]) {
-            showProperty = false;
-            break;
-          }
-        }
-      }
-      return showProperty;
-    }).map(propertyName => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_PropertyRow__WEBPACK_IMPORTED_MODULE_2__["default"], {
+    return Object.keys(componentData.schema).sort().filter(propertyName => (0,_lib_utils__WEBPACK_IMPORTED_MODULE_6__.shouldShowProperty)(propertyName, componentData)).map(propertyName => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_PropertyRow__WEBPACK_IMPORTED_MODULE_2__["default"], {
       name: propertyName,
       schema: componentData.schema[propertyName],
       data: componentData.data[propertyName],
@@ -3048,45 +3034,40 @@ class Component extends (react__WEBPACK_IMPORTED_MODULE_0___default().Component)
     }, propertyName));
   };
   render() {
-    let componentName = this.props.name;
-    let subComponentName = '';
-    if (componentName.indexOf('__') !== -1) {
-      subComponentName = componentName;
-      componentName = componentName.substr(0, componentName.indexOf('__'));
-    }
-    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_Collapsible__WEBPACK_IMPORTED_MODULE_3__["default"], {
+    const componentName = this.props.name;
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)(_Collapsible__WEBPACK_IMPORTED_MODULE_3__["default"], {
       collapsed: this.props.isCollapsed,
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("div", {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
         className: "componentHeader collapsible-header",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("span", {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("span", {
           className: "componentTitle",
-          title: subComponentName || componentName,
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("span", {
-            children: subComponentName || componentName
+          title: componentName,
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("span", {
+            children: componentName
           })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("div", {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxs)("div", {
           className: "componentHeaderActions",
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("a", {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("a", {
             title: "Copy to clipboard",
             className: "button",
             onClick: event => {
               event.preventDefault();
               event.stopPropagation();
-              clipboard_copy__WEBPACK_IMPORTED_MODULE_4___default()((0,_lib_entity__WEBPACK_IMPORTED_MODULE_5__.getComponentClipboardRepresentation)(this.state.entity, (subComponentName || componentName).toLowerCase()));
+              clipboard_copy__WEBPACK_IMPORTED_MODULE_4___default()((0,_lib_entity__WEBPACK_IMPORTED_MODULE_5__.getComponentClipboardRepresentation)(this.state.entity, componentName.toLowerCase()));
             },
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_AwesomeIcon__WEBPACK_IMPORTED_MODULE_1__.AwesomeIcon, {
-              icon: _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__.faClipboard
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_AwesomeIcon__WEBPACK_IMPORTED_MODULE_1__.AwesomeIcon, {
+              icon: _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_10__.faClipboard
             })
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("a", {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("a", {
             title: "Remove component",
             className: "button",
             onClick: this.removeComponent,
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_AwesomeIcon__WEBPACK_IMPORTED_MODULE_1__.AwesomeIcon, {
-              icon: _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__.faTrashAlt
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_AwesomeIcon__WEBPACK_IMPORTED_MODULE_1__.AwesomeIcon, {
+              icon: _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_10__.faTrashAlt
             })
           })]
         })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("div", {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)("div", {
         className: "collapsible-content",
         children: this.renderPropertyRows()
       })]
@@ -3302,8 +3283,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
-/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_13__);
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_14___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_14__);
 /* harmony import */ var clsx__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! clsx */ "./node_modules/clsx/dist/clsx.mjs");
 /* harmony import */ var _widgets_BooleanWidget__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../widgets/BooleanWidget */ "./src/components/widgets/BooleanWidget.js");
 /* harmony import */ var _widgets_ColorWidget__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../widgets/ColorWidget */ "./src/components/widgets/ColorWidget.js");
@@ -3315,8 +3296,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _widgets_Vec3Widget__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../widgets/Vec3Widget */ "./src/components/widgets/Vec3Widget.js");
 /* harmony import */ var _widgets_Vec2Widget__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../widgets/Vec2Widget */ "./src/components/widgets/Vec2Widget.js");
 /* harmony import */ var _lib_entity__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../lib/entity */ "./src/lib/entity.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var _lib_utils__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../lib/utils */ "./src/lib/utils.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 /* eslint-disable no-prototype-builtins */
+
 
 
 
@@ -3333,12 +3316,12 @@ __webpack_require__.r(__webpack_exports__);
 
 class PropertyRow extends (react__WEBPACK_IMPORTED_MODULE_0___default().Component) {
   static propTypes = {
-    componentname: (prop_types__WEBPACK_IMPORTED_MODULE_13___default().string).isRequired,
-    data: prop_types__WEBPACK_IMPORTED_MODULE_13___default().oneOfType([(prop_types__WEBPACK_IMPORTED_MODULE_13___default().array).isRequired, (prop_types__WEBPACK_IMPORTED_MODULE_13___default().bool).isRequired, (prop_types__WEBPACK_IMPORTED_MODULE_13___default().number).isRequired, (prop_types__WEBPACK_IMPORTED_MODULE_13___default().object).isRequired, (prop_types__WEBPACK_IMPORTED_MODULE_13___default().string).isRequired]),
-    entity: (prop_types__WEBPACK_IMPORTED_MODULE_13___default().object).isRequired,
-    isSingle: (prop_types__WEBPACK_IMPORTED_MODULE_13___default().bool).isRequired,
-    name: (prop_types__WEBPACK_IMPORTED_MODULE_13___default().string).isRequired,
-    schema: (prop_types__WEBPACK_IMPORTED_MODULE_13___default().object).isRequired
+    componentname: (prop_types__WEBPACK_IMPORTED_MODULE_14___default().string).isRequired,
+    data: prop_types__WEBPACK_IMPORTED_MODULE_14___default().oneOfType([(prop_types__WEBPACK_IMPORTED_MODULE_14___default().array).isRequired, (prop_types__WEBPACK_IMPORTED_MODULE_14___default().bool).isRequired, (prop_types__WEBPACK_IMPORTED_MODULE_14___default().number).isRequired, (prop_types__WEBPACK_IMPORTED_MODULE_14___default().object).isRequired, (prop_types__WEBPACK_IMPORTED_MODULE_14___default().string).isRequired]),
+    entity: (prop_types__WEBPACK_IMPORTED_MODULE_14___default().object).isRequired,
+    isSingle: (prop_types__WEBPACK_IMPORTED_MODULE_14___default().bool).isRequired,
+    name: (prop_types__WEBPACK_IMPORTED_MODULE_14___default().string).isRequired,
+    schema: (prop_types__WEBPACK_IMPORTED_MODULE_14___default().object).isRequired
   };
   constructor(props) {
     super(props);
@@ -3348,8 +3331,11 @@ class PropertyRow extends (react__WEBPACK_IMPORTED_MODULE_0___default().Componen
     const props = this.props;
     const isMap = props.componentname === 'material' && (props.name === 'envMap' || props.name === 'src');
     let type = props.schema.type;
-    if (props.componentname === 'animation' && props.name === 'loop') {
-      // fix wrong number type for animation loop property
+    if ((props.componentname === 'animation' || props.componentname.startsWith('animation__')) && props.name === 'loop') {
+      // The loop property can be a boolean for an infinite loop or a number to set the number of iterations.
+      // It's auto detected as number because the default value is 0, but for most use case we want an infinite loop
+      // so we're forcing the type to boolean. In the future we could create a custom widget to allow user to choose
+      // between infinite loop and number of iterations.
       type = 'boolean';
     }
     const value = props.schema.type === 'selector' ? props.entity.getDOMAttribute(props.componentname)?.[props.name] : props.data;
@@ -3368,28 +3354,28 @@ class PropertyRow extends (react__WEBPACK_IMPORTED_MODULE_0___default().Componen
       max: props.schema.hasOwnProperty('max') ? props.schema.max : Infinity
     };
     if (props.schema.oneOf && props.schema.oneOf.length > 0) {
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_widgets_SelectWidget__WEBPACK_IMPORTED_MODULE_6__["default"], {
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_widgets_SelectWidget__WEBPACK_IMPORTED_MODULE_6__["default"], {
         ...widgetProps,
         options: props.schema.oneOf,
         isMulti: props.schema.type === 'array'
       });
     }
     if (type === 'map' || isMap) {
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_widgets_TextureWidget__WEBPACK_IMPORTED_MODULE_7__["default"], {
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_widgets_TextureWidget__WEBPACK_IMPORTED_MODULE_7__["default"], {
         ...widgetProps
       });
     }
     switch (type) {
       case 'number':
         {
-          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_widgets_NumberWidget__WEBPACK_IMPORTED_MODULE_5__["default"], {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_widgets_NumberWidget__WEBPACK_IMPORTED_MODULE_5__["default"], {
             ...widgetProps,
             ...numberWidgetProps
           });
         }
       case 'int':
         {
-          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_widgets_NumberWidget__WEBPACK_IMPORTED_MODULE_5__["default"], {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_widgets_NumberWidget__WEBPACK_IMPORTED_MODULE_5__["default"], {
             ...widgetProps,
             ...numberWidgetProps,
             precision: 0
@@ -3397,31 +3383,31 @@ class PropertyRow extends (react__WEBPACK_IMPORTED_MODULE_0___default().Componen
         }
       case 'vec2':
         {
-          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_widgets_Vec2Widget__WEBPACK_IMPORTED_MODULE_10__["default"], {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_widgets_Vec2Widget__WEBPACK_IMPORTED_MODULE_10__["default"], {
             ...widgetProps
           });
         }
       case 'vec3':
         {
-          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_widgets_Vec3Widget__WEBPACK_IMPORTED_MODULE_9__["default"], {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_widgets_Vec3Widget__WEBPACK_IMPORTED_MODULE_9__["default"], {
             ...widgetProps
           });
         }
       case 'vec4':
         {
-          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_widgets_Vec4Widget__WEBPACK_IMPORTED_MODULE_8__["default"], {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_widgets_Vec4Widget__WEBPACK_IMPORTED_MODULE_8__["default"], {
             ...widgetProps
           });
         }
       case 'color':
         {
-          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_widgets_ColorWidget__WEBPACK_IMPORTED_MODULE_3__["default"], {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_widgets_ColorWidget__WEBPACK_IMPORTED_MODULE_3__["default"], {
             ...widgetProps
           });
         }
       case 'boolean':
         {
-          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_widgets_BooleanWidget__WEBPACK_IMPORTED_MODULE_2__["default"], {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_widgets_BooleanWidget__WEBPACK_IMPORTED_MODULE_2__["default"], {
             ...widgetProps
           });
         }
@@ -3431,10 +3417,29 @@ class PropertyRow extends (react__WEBPACK_IMPORTED_MODULE_0___default().Componen
             // Allow editing a custom type like event-set component schema
             widgetProps.value = props.schema.stringify(widgetProps.value);
           }
-          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_widgets_InputWidget__WEBPACK_IMPORTED_MODULE_4__["default"], {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_widgets_InputWidget__WEBPACK_IMPORTED_MODULE_4__["default"], {
             ...widgetProps
           });
         }
+    }
+  }
+  isPropertyDefined() {
+    const props = this.props;
+    let definedValue;
+    let defaultValue;
+    // getDOMAttribute returns null if the component doesn't exist, and
+    // in the case of a multi-properties component it returns undefined
+    // if it exists but has the default values.
+    if (props.isSingle) {
+      definedValue = props.entity.getDOMAttribute(props.componentname);
+      if (definedValue === null) return false;
+      defaultValue = props.entity.components[props.componentname].schema.default;
+      return !(0,_lib_utils__WEBPACK_IMPORTED_MODULE_12__.equal)(definedValue, defaultValue);
+    } else {
+      definedValue = (props.entity.getDOMAttribute(props.componentname) || {})[props.name];
+      if (definedValue === undefined) return false;
+      defaultValue = props.entity.components[props.componentname].schema[props.name].default;
+      return !(0,_lib_utils__WEBPACK_IMPORTED_MODULE_12__.equal)(definedValue, defaultValue);
     }
   }
   render() {
@@ -3443,11 +3448,11 @@ class PropertyRow extends (react__WEBPACK_IMPORTED_MODULE_0___default().Componen
     const title = props.name + '\n - type: ' + props.schema.type + '\n - value: ' + value;
     const className = (0,clsx__WEBPACK_IMPORTED_MODULE_1__["default"])({
       propertyRow: true,
-      propertyRowDefined: props.isSingle ? !!props.entity.getDOMAttribute(props.componentname) : props.name in (props.entity.getDOMAttribute(props.componentname) || {})
+      propertyRowDefined: this.isPropertyDefined()
     });
-    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("div", {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)("div", {
       className: className,
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("label", {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)("label", {
         htmlFor: this.id,
         className: "text",
         title: title,
@@ -4309,7 +4314,7 @@ class Entity extends (react__WEBPACK_IMPORTED_MODULE_0___default().Component) {
   onDoubleClick = () => _lib_Events__WEBPACK_IMPORTED_MODULE_5__["default"].emit('objectfocus', this.props.entity.object3D);
   toggleVisibility = () => {
     const entity = this.props.entity;
-    const visible = entity.tagName.toLowerCase() === 'a-scene' ? entity.object3D.visible : entity.getAttribute('visible');
+    const visible = entity.object3D.visible;
     entity.setAttribute('visible', !visible);
   };
   render() {
@@ -4359,7 +4364,7 @@ class Entity extends (react__WEBPACK_IMPORTED_MODULE_0___default().Component) {
     }
 
     // Visibility button.
-    const visible = tagName === 'a-scene' ? entity.object3D.visible : entity.getAttribute('visible');
+    const visible = entity.object3D.visible;
     const visibilityButton = /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("i", {
       title: "Toggle entity visibility",
       onClick: this.toggleVisibility,
@@ -4452,6 +4457,7 @@ class SceneGraph extends (react__WEBPACK_IMPORTED_MODULE_0___default().Component
       filteredEntities: [],
       selectedIndex: -1
     };
+    this.rebuildEntityOptions = lodash_debounce__WEBPACK_IMPORTED_MODULE_2___default()(this.rebuildEntityOptions.bind(this), 0);
     this.updateFilteredEntities = lodash_debounce__WEBPACK_IMPORTED_MODULE_2___default()(this.updateFilteredEntities.bind(this), 100);
   }
   onEntityUpdate = detail => {
@@ -4459,18 +4465,23 @@ class SceneGraph extends (react__WEBPACK_IMPORTED_MODULE_0___default().Component
       this.rebuildEntityOptions();
     }
   };
+  onChildAttachedDetached = event => {
+    if (this.includeInSceneGraph(event.detail.el)) {
+      this.rebuildEntityOptions();
+    }
+  };
   componentDidMount() {
     this.rebuildEntityOptions();
     _lib_Events__WEBPACK_IMPORTED_MODULE_5__["default"].on('entityidchange', this.rebuildEntityOptions);
-    _lib_Events__WEBPACK_IMPORTED_MODULE_5__["default"].on('entitycreated', this.rebuildEntityOptions);
-    _lib_Events__WEBPACK_IMPORTED_MODULE_5__["default"].on('entityclone', this.rebuildEntityOptions);
     _lib_Events__WEBPACK_IMPORTED_MODULE_5__["default"].on('entityupdate', this.onEntityUpdate);
+    document.addEventListener('child-attached', this.onChildAttachedDetached);
+    document.addEventListener('child-detached', this.onChildAttachedDetached);
   }
   componentWillUnmount() {
     _lib_Events__WEBPACK_IMPORTED_MODULE_5__["default"].off('entityidchange', this.rebuildEntityOptions);
-    _lib_Events__WEBPACK_IMPORTED_MODULE_5__["default"].off('entitycreated', this.rebuildEntityOptions);
-    _lib_Events__WEBPACK_IMPORTED_MODULE_5__["default"].off('entityclone', this.rebuildEntityOptions);
     _lib_Events__WEBPACK_IMPORTED_MODULE_5__["default"].off('entityupdate', this.onEntityUpdate);
+    document.removeEventListener('child-attached', this.onChildAttachedDetached);
+    document.removeEventListener('child-detached', this.onChildAttachedDetached);
   }
 
   /**
@@ -4507,6 +4518,7 @@ class SceneGraph extends (react__WEBPACK_IMPORTED_MODULE_0___default().Component
         this.expandToRoot(entity);
         _lib_Events__WEBPACK_IMPORTED_MODULE_5__["default"].emit('entityselect', entity);
         found = true;
+        break;
       }
     }
     if (!found) {
@@ -4515,19 +4527,22 @@ class SceneGraph extends (react__WEBPACK_IMPORTED_MODULE_0___default().Component
       });
     }
   };
+  includeInSceneGraph = element => {
+    return !(element.dataset.isInspector || !element.isEntity || element.isInspector || 'aframeInspector' in element.dataset);
+  };
   rebuildEntityOptions = () => {
     const entities = [{
       depth: 0,
       entity: this.props.scene
     }];
-    function treeIterate(element, depth) {
+    const treeIterate = (element, depth) => {
       if (!element) {
         return;
       }
       depth += 1;
       for (let i = 0; i < element.children.length; i++) {
         let entity = element.children[i];
-        if (entity.dataset.isInspector || !entity.isEntity || entity.isInspector || 'aframeInspector' in entity.dataset) {
+        if (!this.includeInSceneGraph(entity)) {
           continue;
         }
         entities.push({
@@ -4537,7 +4552,7 @@ class SceneGraph extends (react__WEBPACK_IMPORTED_MODULE_0___default().Component
         });
         treeIterate(entity, depth);
       }
-    }
+    };
     treeIterate(this.props.scene, 0);
     this.setState({
       entities: entities,
@@ -4729,7 +4744,7 @@ function filterEntity(entity, filter) {
   }
 
   // Check if the ID, tagName, class, selector includes the filter.
-  if (entity.id.toUpperCase().indexOf(filter.toUpperCase()) !== -1 || entity.tagName.toUpperCase().indexOf(filter.toUpperCase()) !== -1 || entity.classList.contains(filter) || entity.matches(filter)) {
+  if (entity.id.toUpperCase().indexOf(filter.toUpperCase()) !== -1 || entity.tagName.indexOf(filter.toUpperCase()) !== -1 || entity.classList.contains(filter) || entity.matches(filter)) {
     return true;
   }
   return false;
@@ -4825,9 +4840,9 @@ class Toolbar extends (react__WEBPACK_IMPORTED_MODULE_0___default().Component) {
    */
   writeChanges = () => {
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'http://localhost:51234/save');
+    xhr.open('PUT', '/scene/inspector/update');
     xhr.onerror = () => {
-      alert('aframe-watcher not running. This feature requires a companion service running locally. npm install aframe-watcher to save changes back to file. Read more at https://github.com/supermedium/aframe-watcher');
+      alert('Save error. Method not alowed');
     };
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify(AFRAME.INSPECTOR.history.updates));
@@ -5612,7 +5627,7 @@ class SelectWidget extends (react__WEBPACK_IMPORTED_MODULE_0___default().Compone
     name: (prop_types__WEBPACK_IMPORTED_MODULE_2___default().string).isRequired,
     onChange: (prop_types__WEBPACK_IMPORTED_MODULE_2___default().func),
     options: (prop_types__WEBPACK_IMPORTED_MODULE_2___default().array).isRequired,
-    value: prop_types__WEBPACK_IMPORTED_MODULE_2___default().oneOfType([(prop_types__WEBPACK_IMPORTED_MODULE_2___default().string), (prop_types__WEBPACK_IMPORTED_MODULE_2___default().array)]).isRequired
+    value: prop_types__WEBPACK_IMPORTED_MODULE_2___default().oneOfType([(prop_types__WEBPACK_IMPORTED_MODULE_2___default().number), (prop_types__WEBPACK_IMPORTED_MODULE_2___default().string), (prop_types__WEBPACK_IMPORTED_MODULE_2___default().array)]).isRequired
   };
   static defaultProps = {
     isMulti: false
@@ -5825,8 +5840,11 @@ class TextureWidget extends (react__WEBPACK_IMPORTED_MODULE_0___default().Compon
     var isAssetHash = value[0] === '#';
     var isAssetImg = value instanceof HTMLImageElement;
     var isAssetVideo = value instanceof HTMLVideoElement;
-    var isAssetImgOrVideo = isAssetImg || isAssetVideo;
-    if (isAssetImgOrVideo) {
+    var isAssetCanvas = value instanceof HTMLCanvasElement;
+    var isAssetElement = isAssetImg || isAssetVideo || isAssetCanvas;
+    if (isAssetCanvas) {
+      url = null;
+    } else if (isAssetImg || isAssetVideo) {
       url = value.src;
     } else if (isAssetHash) {
       url = getUrlFromId(value);
@@ -5835,7 +5853,7 @@ class TextureWidget extends (react__WEBPACK_IMPORTED_MODULE_0___default().Compon
     }
     var texture = getTextureFromSrc(value);
     var valueType = null;
-    valueType = isAssetImgOrVideo || isAssetHash ? 'asset' : 'url';
+    valueType = isAssetElement || isAssetHash ? 'asset' : 'url';
     if (!isAssetVideo && texture) {
       texture.then(paintPreview);
     } else if (!isAssetVideo && url) {
@@ -5849,7 +5867,7 @@ class TextureWidget extends (react__WEBPACK_IMPORTED_MODULE_0___default().Compon
       context.clearRect(0, 0, canvas.width, canvas.height);
     }
     this.setState({
-      value: isAssetImgOrVideo ? '#' + value.id : value,
+      value: isAssetElement ? '#' + value.id : value,
       valueType: valueType,
       url: url
     });
@@ -5893,7 +5911,10 @@ class TextureWidget extends (react__WEBPACK_IMPORTED_MODULE_0___default().Compon
     let hint = '';
     if (this.state.value) {
       if (this.state.valueType === 'asset') {
-        hint = 'Asset ID: ' + this.state.value + '\nURL: ' + this.state.url;
+        hint = 'Asset ID: ' + this.state.value;
+        if (this.state.url !== null) {
+          hint += '\nURL: ' + this.state.url;
+        }
       } else {
         hint = 'URL: ' + this.state.value;
       }
@@ -7571,9 +7592,9 @@ function updateEntity(entity, component, property, value) {
  * Remove an entity.
  *
  * @param {Element} entity Entity to remove.
- * @param {boolean} force (Optional) If true it won't ask for confirmation.
+ * @param {boolean} [force=false] If true it won't ask for confirmation.
  */
-function removeEntity(entity, force) {
+function removeEntity(entity, force = false) {
   if (entity) {
     if (force === true || confirm('Do you really want to remove entity `' + (entity.id || entity.tagName) + '`?')) {
       var closest = findClosestEntity(entity);
@@ -7608,9 +7629,9 @@ function findClosestEntity(entity) {
 
 /**
  * Remove the selected entity
- * @param  {boolean} force (Optional) If true it won't ask for confirmation
+ * @param {boolean} [force=false] If true it won't ask for confirmation.
  */
-function removeSelectedEntity(force) {
+function removeSelectedEntity(force = false) {
   if (AFRAME.INSPECTOR.selectedEntity) {
     removeEntity(AFRAME.INSPECTOR.selectedEntity, force);
   }
@@ -7991,13 +8012,26 @@ function getUniqueId(baseId) {
 }
 function getComponentClipboardRepresentation(entity, componentName) {
   entity.flushToDOM();
-  const data = entity.getDOMAttribute(componentName);
+  let data = entity.getDOMAttribute(componentName);
   if (!data) {
     return componentName;
   }
-  const schema = entity.components[componentName].schema;
-  const attributes = stringifyComponentValue(schema, data);
-  return `${componentName}="${attributes}"`;
+  const component = entity.components[componentName];
+  const schema = component.schema;
+  // If multi-properties component, filter out properties that are the same as their default value
+  if (!isSingleProperty(schema)) {
+    data = {
+      ...data
+    };
+    for (const [propertyName, value] of Object.entries(data)) {
+      const defaultValue = getDefaultValue(component, propertyName);
+      if ((0,_utils__WEBPACK_IMPORTED_MODULE_1__.equal)(value, defaultValue)) {
+        delete data[propertyName];
+      }
+    }
+  }
+  const properties = stringifyComponentValue(schema, data);
+  return `${componentName}="${properties}"`;
 }
 
 /**
@@ -8400,7 +8434,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   injectCSS: () => (/* binding */ injectCSS),
 /* harmony export */   injectJS: () => (/* binding */ injectJS),
 /* harmony export */   saveBlob: () => (/* binding */ saveBlob),
-/* harmony export */   saveString: () => (/* binding */ saveString)
+/* harmony export */   saveString: () => (/* binding */ saveString),
+/* harmony export */   shouldShowProperty: () => (/* binding */ shouldShowProperty)
 /* harmony export */ });
 function equal(var1, var2) {
   var keys1;
@@ -8493,6 +8528,45 @@ function saveBlob(blob, filename) {
 // Smaller vectors (ie. vec2) should work as well since their z & w vals will be the same (undefined)
 function areVectorsEqual(v1, v2) {
   return Object.is(v1.x, v2.x) && Object.is(v1.y, v2.y) && Object.is(v1.z, v2.z) && Object.is(v1.w, v2.w);
+}
+
+/**
+ * Check if a property should be shown in the UI based on the `if` object
+ * condition included in the schema for the property.
+ *
+ * When more than one property is used in the object, this applies a logical AND.
+ * When the value is an array, it means one of the entries in this array.
+ *
+ * Example in the light component:
+ * ```js
+ * {
+ *   penumbra: {default: 0, min: 0, max: 1, if: {type: ['spot']}},
+ * }
+ * ```
+ *
+ * @param {string} propertyName - The name of the property
+ * @param {Component} component - The component instance
+ * @returns {boolean} Whether the property should be shown
+ */
+function shouldShowProperty(propertyName, component) {
+  if (!component.schema[propertyName].if) {
+    return true;
+  }
+  let showProperty = true;
+  for (const [conditionKey, conditionValue] of Object.entries(component.schema[propertyName].if)) {
+    if (Array.isArray(conditionValue)) {
+      if (conditionValue.indexOf(component.data[conditionKey]) === -1) {
+        showProperty = false;
+        break;
+      }
+    } else {
+      if (conditionValue !== component.data[conditionKey]) {
+        showProperty = false;
+        break;
+      }
+    }
+  }
+  return showProperty;
 }
 
 /***/ }),
@@ -9034,18 +9108,6 @@ body.aframe-inspector-opened {
   position: fixed;
   width: 331px;
 }
-#aframeInspector div.vec2,
-#aframeInspector div.vec3,
-#aframeInspector div.vec4 {
-  display: inline;
-}
-#aframeInspector .vec2 input.number,
-#aframeInspector .vec3 input.number {
-  width: 40px;
-}
-#aframeInspector .vec4 input.number {
-  width: 34px;
-}
 #aframeInspector .collapsible-header {
   align-items: center;
   display: flex;
@@ -9124,6 +9186,21 @@ body.aframe-inspector-opened {
   text-overflow: ellipsis;
   vertical-align: middle;
   width: 118px;
+}
+#aframeInspector .propertyRow input.number {
+  width: 40px;
+}
+#aframeInspector .propertyRow .vec2 input.number,
+#aframeInspector .propertyRow .vec3 input.number {
+  width: 40px;
+}
+#aframeInspector .propertyRow .vec4 input.number {
+  width: 34px;
+}
+#aframeInspector .propertyRow .vec2,
+#aframeInspector .propertyRow .vec3,
+#aframeInspector .propertyRow vec4 {
+  display: inline;
 }
 #aframeInspector .propertyRow .map_value {
   margin: 0 0 0 5px;
@@ -10040,7 +10117,7 @@ body.aframe-inspector-opened {
     opacity: 1;
   }
 }
-`, "",{"version":3,"sources":["webpack://./src/style/lib.styl","webpack://./src/style/index.styl","webpack://./src/style/scenegraph.styl","webpack://./src/style/components.styl","webpack://./src/style/entity.styl","webpack://./src/style/help.styl","webpack://./src/style/select.styl","webpack://./src/style/textureModal.styl","webpack://./src/style/viewport.styl","webpack://./src/style/widgets.styl"],"names":[],"mappings":"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","sourcesContent":["$primary=#1faaf2\n$primaryhover=lighten(#1faaf2, 35%)\n\n$bg=#242424\n$bgdark=#1d1d1d\n$bglight=#333\n$bglighter=#393939\n\n$red=#92374d\n$green=#514b23\n$orange=#d66853\n\n$black=#222\n$gray=#262626\n$grayalt=#323232\n$grayhover=#444\n\n$lightgray=#AAA\n$white=#c3c3c3\n\n$normalfont=system-ui, BlinkMacSystemFont, -apple-system, \"Segoe UI\", Helvetica, Arial, sans-serif\n$monospace=system-ui, BlinkMacSystemFont, -apple-system, \"Segoe UI\", Helvetica, Arial, sans-serif\n\nmedia--1024() {\n  @media (min-width: 1024px) {\n    {block}\n  }\n}\n\n/* CSS rules from the original FontAwesomeIcon component */\nsvg:not(:root).svg-inline--fa, svg:not(:host).svg-inline--fa {\n  overflow: visible;\n  box-sizing: content-box;\n}\n\n.svg-inline--fa {\n  display: inline-block;\n  height: 1em;\n  overflow: visible;\n  vertical-align: -0.125em;\n}","@import './lib';\n\nbody.aframe-inspector-opened,\n.toggle-edit,\n.sponsor-btn\n  font-family BlinkMacSystemFont, -apple-system, \"Segoe UI\", Helvetica, Arial, sans-serif\n\n.wf-roboto-n4-active body.aframe-inspector-opened,\n.wf-roboto-n4-active .toggle-edit,\n.wf-roboto-n4-active .sponsor-btn\n  font-family BlinkMacSystemFont, -apple-system, \"Segoe UI\", Helvetica, Arial, sans-serif\n\nbody.aframe-inspector-opened\n  background $bgdark\n  color #fff\n  font-size 12px\n  margin 0\n  overflow hidden\n\n#aframeInspector\n  @import './scenegraph';\n  @import './components';\n  @import './entity';\n  @import './help';\n  @import './select';\n  @import './textureModal';\n  @import './viewport';\n  @import './widgets';\n\n  .Select,\n  code,\n  pre,\n  input,\n  textarea,\n  select\n    font-family $monospace\n    font-size 13px\n\n  .wf-robotomono-n4-active .Select,\n  .wf-robotomono-n4-active code,\n  .wf-robotomono-n4-active pre,\n  .wf-robotomono-n4-active input,\n  .wf-robotomono-n4-active textarea,\n  .wf-robotomono-n4-active select\n    font-family Roboto Mono, Consolas, Andale Mono, Monaco, Courier New, monospace\n\n  hr\n    border 0\n    border-top 1px solid #ccc\n\n  a\n    cursor pointer\n\n  button\n    position relative\n\n  code\n    font-family Consolas, Andale Mono, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace\n\n  textarea\n    tab-size 4\n    white-space pre\n    word-wrap normal\n\n  textarea.success\n    border-color #8b8 !important\n\n  textarea.fail\n    background-color rgba(255, 0, 0, 0.05)\n    border-color #f00 !important\n\n  textarea,\n  input\n    outline none /* osx */\n\n  .gltfIcon img\n    box-sizing content-box\n    display inline\n    height 20px\n    left 5px\n    padding 0 5px\n    position relative\n    top 4px\n    vertical-align baseline\n    width 20px\n\n  #scenegraph,\n  #rightPanel\n    z-index 9998\n\n  #sidebar,\n  #scenegraph,\n    .panel\n      cursor default\n      user-select none\n\n  .toggle-edit\n    background-color $red\n    box-sizing content-box\n    color #FAFAFA\n    font-size 13px\n    left 3px\n    line-height 16px\n    margin 0\n    padding 6px 10px\n    position fixed\n    text-align center\n    text-decoration none\n    top 3px\n    width 100px\n    z-index 999999999\n\n  .toggle-edit:hover\n    background-color rgb(228, 43, 90)\n\n  .try-editor-btn\n    background-color $red\n    box-sizing content-box\n    color #FAFAFA\n    font-size 16px\n    line-height 24px\n    margin 0\n    padding 6px 10px\n    text-align center\n    text-decoration none\n    width 200px\n    display flex\n    gap 5px\n    justify-content center\n\n  .try-editor-btn:hover\n    background-color rgb(228, 43, 90)\n    color #FAFAFA\n\n  .sponsor-btn\n    background-color #ffffff\n    box-sizing content-box\n    color #000000\n    font-size 13px\n    left 127px\n    line-height 16px\n    margin 0\n    padding 6px 10px\n    position fixed\n    text-align center\n    text-decoration none\n    top 3px\n    width 80px\n    z-index 999999999\n    display flex\n    gap 5px\n    justify-content center\n\n    svg\n      fill currentColor\n      color rgb(219, 97, 162)\n\n  .sponsor-btn:hover\n    background-color rgb(228, 43, 90)\n    color #FAFAFA\n\n  input\n    background-color transparent\n    border 1px solid #555\n    color #fff\n\n  input,\n  .texture canvas\n    transition 0.1s background-color ease-in-out, 0.1s border-color ease-in-out, 0.1s color ease-in-out\n\n  input[type=text],\n  input[type=number],\n  input.string,\n  input.number\n    min-height 14px\n    outline none\n\n  input[type=\"checkbox\"]\n    appearance auto\n    cursor pointer\n    margin 0\n    height 18px\n    width 18px\n\n  input[type=\"checkbox\"]:focus\n    box-shadow none\n\n  input.number\n    background-color transparent !important\n    border 0\n    color #2cb7ff !important\n    cursor col-resize\n    font-size 13px\n    padding 2px\n\n  input.stringfocus,\n  input.numberfocus\n    border 1px solid #20b1fb\n    color #fff\n    cursor auto\n\n  input.error\n    border 1px solid #a00\n\n  #sidebar\n    background $bg\n    width 331px\n\n  #sidebar *\n    vertical-align middle\n\n  input,\n  textarea,\n  select\n    background $black\n    border 1px solid transparent\n    color #888\n\n  select\n    background $bglighter\n\n  input[type=color]\n    background-color #333\n    border 1px solid #111\n    height 28px\n    cursor pointer\n\n  input[type=color]\n    cursor pointer\n    height 25px\n    padding 0\n    width 50px\n\n  /* Note these vendor-prefixed selectors cannot be grouped! */\n  input[type=color]-webkit-color-swatch\n    border 0  /* To remove the gray border. */\n\n  input[type=color]-webkit-color-swatch-wrapper\n    padding 0  /* To remove the inner padding. */\n\n  input[type=color]-moz-color-swatch\n    border 0\n\n  input[type=color]-moz-focus-inner\n    border 0  /* To remove the inner border (specific to Firefox). */\n    padding 0\n\n  .hidden\n    visibility hidden\n\n  a.button\n    color #bcbcbc\n    font-size 16px\n    margin-left 10px\n    text-decoration none\n\n    &:hover\n      color $primary\n\n  @keyframes animateopacity\n    from { opacity: 0 }\n    to { opacity: 1 }\n\n  .hide\n    display none\n\n  .a-canvas.state-dragging\n    cursor grabbing\n\n  #rightPanel\n    align-items stretch\n    display flex\n    justify-content flex-end\n\n  #inspectorContainer\n    display flex\n    justify-content space-between\n    left 0\n    height 100%\n    pointer-events none\n    position fixed\n    top 0\n    width 100%\n    z-index 999999\n\n  #scenegraph,\n  #viewportBar,\n  #rightPanel\n    pointer-events all\n\n  .aframe-inspector-opened a-scene .a-canvas\n    background-color #191919\n    z-index 9998\n\n  .toggle-sidebar\n    align-items center\n    display flex\n    height 100%\n    position absolute\n    z-index 9998\n\n    a\n      background-color #262626\n      color #bcbcbc\n      padding 5px\n      z-index 9998\n\n    a.hover\n      background-color #1faaf2\n      color #fff\n\n  .toggle-sidebar.left\n    top 0\n    left 0\n\n  .toggle-sidebar.right\n    top 0\n    right 0\n","@import './lib';\n\n#toolbar\n  background-color $bg\n\n  .toolbarActions\n    padding 0 0 5px\n    display flex\n    align-items baseline\n\n    a.disabled\n      color #666\n      cursor default\n\n    .helpButtonContainer\n      flex-grow 1\n      padding-right 10px\n      text-align right\n\n#scenegraph\n  background $bg\n  border-top 1px solid #111\n  display flex\n  flex-direction column\n  overflow auto\n  padding-top 32px\n  width 230px\n\n  .entity\n    background $bg\n    cursor pointer\n    display flex\n    justify-content space-between\n    padding 3px\n    width 100%\n    white-space nowrap\n\n    &:hover\n      background #1d2f39\n\n    &.active\n      background-color #155373\n      color #fff\n      .component:hover\n        color #1888c1\n      .entityActions\n        display inline\n\n    &.novisible\n      &.active\n        span,\n        svg,\n        .collapsespace,\n        .id\n          color #999\n\n      &:not(.active)\n        span,\n        svg,\n        .collapsespace,\n        .id\n          color #626262\n\n  .component:hover\n    color #1faaf2\n\n  .entityIcons\n    margin-left 2px\n\n  .entityActions\n    display none\n    margin 0 14px\n\n    .button\n      color #fff\n      font-size 12px\n      margin-left 6px\n\n  svg\n    color #CCC\n\n  .toolbarActions svg:hover,\n  .entityActions svg:hover\n    color $primary\n\n  .active svg\n    color #FAFAFA\n\n  .id\n    color #ccc\n\n  .option.active .id\n    color #fff\n\n  .collapsespace\n    color #eee\n    display inline-block\n    text-align center\n    width 14px\n\n  .fa-eye\n    color #bbb\n\n  .icons a.button\n    color #fff\n\n  .search\n    padding 5px\n    font-size 16px\n    position relative\n\n    input\n      color $white\n      background $bgdark\n      border-radius 5px\n      height 22px\n      text-indent 10px\n      width 216px\n\n    >svg, a.button\n      position absolute\n      right 14px\n      top 10px\n\n  .outliner\n    background $bg\n    color $white\n    cursor default\n    flex 1 1 auto\n    font-size 13px\n    height calc(100% - 98px)\n    line-height normal\n    outline none\n    overflow-y auto\n    padding 0\n    width 230px\n\n.scenegraph-bottom\n  background-color #323232\n  border-top 1px solid #111\n  bottom 10\n  height 40px\n  left 0\n  z-index 100\n\n  a\n    float right\n    margin 10px\n","@import './lib';\n\npropertyRowDefined() {\n  .propertyRowDefined {\n    {block}\n  }\n}\n\n.components\n  background-color $bg\n  color $white\n  height 100%\n  overflow auto\n  position fixed\n  width 331px\n\ndiv.vec2,\ndiv.vec3,\ndiv.vec4\n  display inline\n\n.vec2 input.number,\n.vec3 input.number\n  width 40px\n\n.vec4 input.number\n  width 34px\n\n.collapsible-header\n  align-items center\n  display flex\n  justify-content space-between\n  .entityPrint\n    color #fff\n\n.collapsible-content\n  padding 5px 0\n\n.componentTitle span\n  max-width 200px\n  overflow hidden\n  text-overflow ellipsis\n  text-transform uppercase\n  white-space nowrap\n  color #fff\n  font-weight 600\n  vertical-align bottom !important\n\n.collapsible .static\n  background $bglight\n  border-bottom 2px solid $bg\n  box-sizing content-box\n  cursor pointer\n  height 16px\n  padding 8px 10px 12px 10px\n  vertical-align bottom\n  font-size 13px\n  &:hover\n    background $bglighter\n/*\n.collapsible\n  &.collapsed\n    background-color $grayalt\n    .static,\n    .componentHeaderActions\n      color #dedede\n    &:hover\n      background-color $grayhover\n*/\n.collapsible .menu\n  text-align right\n\n.collapsible .menuafter\n  color #bbb\n  content '\\2807'\n  font-size 12px\n  padding 5px\n  text-align right\n\n.collapsible .static\n  margin 0\n\n.collapsible .static .collapse-button\n  border 6px solid transparent\n  float left\n  height 0\n  margin-right 10px\n  margin-left 2px\n  width 0\n\n.collapsible.collapsed .static .collapse-button\n  border-left-color $white\n  margin-top 4px\n\n.collapsible:not(.collapsed) .static .collapse-button\n  border-top-color $white\n  margin-top 7px\n\n.propertyRow\n  align-items center\n  display flex\n  font-size 13px\n  min-height 30px\n  padding 2px 15px\n\n  .text\n    cursor default\n    display inline-block\n    overflow hidden\n    padding-right 10px\n    text-overflow ellipsis\n    vertical-align middle\n    width 118px\n\n  .map_value\n    margin 0 0 0 5px\n    width 68px\n\n  .Select-control\n    font-size 11px\n    height 24px\n\n  .Select-placeholder,\n  .Select--single > .Select-control .Select-value\n    line-height 19px\n\n  .Select-input\n    height 22px\n\n  input[type=text],\n  input[type=number],\n  input.string,\n  input.number\n    background $bgdark\n    color #1faaf2\n    min-height 26px\n    padding-bottom 1px\n    padding-left 5px\n    padding-right 5px\n    padding-top 1px\n    &:last-child\n      padding-right 0\n\n  input.string\n    padding-left 8px\n    box-sizing border-box\n    width 165px\n\n  input[type=text]:focus,\n  input.string:focus\n    box-shadow none\n\n  .color_value\n    margin 0 0 0 5px\n    width 68px\n    letter-spacing 1px\n\n.propertyRowDefined .text\n  color #FAFAFA\n  font-weight 500\n\n.components *\n  vertical-align middle\n\nspan.subcomponent\n  color #999\n  float none !important\n  margin-left 10px\n  vertical-align top !important\n\n#addComponentContainer\n  align-items center\n  display flex\n  flex-direction column\n  justify-content center\n  padding 20px 10px\n  background $bgdark\n\n  #addComponent\n    text-align left\n    width 200px\n    .select__control\n      background #161616\n      height 35px\n      color $primary\n\n  #addComponentHeader\n    font-size 15px\n    margin 5px 0 10px 0\n\n  input[type=text]:focus\n    box-shadow none\n\n.Select-menu-outer .is-focused span\n  color #fff\n\n.component-title\n  align-items center\n  display flex\n\n#componentEntityHeader\n  .collapsible-header\n    bottom 4px\n    position relative\n  .collapse-button\n    display none\n  .static\n    height 13px\n  .entityPrint\n    font-size 15px\n    padding-left 5px\n  .entityName\n    max-width 160px\n    top 0\n  .entityIcons\n    color #FAFAFA\n\n#mixinSelect\n  width 160px\n\n.propertyRow .texture\n  display flex\n  input\n    margin-left 0\n    width 120px\n\n#componentEntityHeader .gltfIcon img\n  top 0","@import './lib';\n\n.entityPrint\n  font-family $normalfont\n  line-height 1.15em\n\n.entityName\n  display inline-block\n  overflow hidden\n  position relative\n  text-overflow ellipsis\n  top 3px\n  white-space nowrap\n\n[data-entity-name-type=\"id\"]\n  color $red\n\n[data-entity-name-type=\"class\"]\n  color $green\n\n[data-entity-name-type=\"mixin\"]\n  color $orange\n",".help-lists\n  display flex\n  justify-content space-around\n\n.help-list\n  list-style none\n  margin 0\n  padding 0 0 10px\n  width 350px\n\n.help-list li\n  margin-right 40px\n\n.help-key-unit\n  line-height 1.8\n  margin-right 2em\n  padding 5px 0\n\n.help-key\n  bottom 2px\n  margin-right 4px\n  min-width 60px\n  position relative\n\n.help-key span\n  background-color #2e2e2e\n  background-repeat repeat-x\n  border 1px solid #666\n  border-radius 3px\n  box-shadow 0 0 5px #000\n  color #999\n  display inline-block\n  font-size 12px\n  padding 0 8px\n  text-align center\n\n.help-key-def\n  color #bbb\n  display inline-block\n  margin-left 1em\n","@import './lib';\n\n.select__control\n  border 0\n  border-radius 0\n  cursor pointer\n  min-height 26px\n  font-family $monospace\n  font-size 13px\n\n.select__indicator\n  height 26px\n\n.select__indicator-separator\n  display none\n\n.select__input\n  min-height auto !important\n\n.select__control,\n.select__menu\n  background $bgdark\n\n.select__option\n  padding 5px 10px\n\n.select__placeholder,\n.select__menu\n  color $white\n\n.select__single-value\n  color $primary\n\n.select__control--is-focused\n  box-shadow none !important\n\n.select__option\n  cursor pointer\n\n.select__label\n  font-size 11px\n\n.select__option--is-focused\n  background #155373\n\n.select__value-container\n  height 26px\n  position static\n  &.select__value-container--is-multi\n    height auto\n    padding 6px\n\n.select__dropdown-indicator\n  padding 3px 8px\n\n.select__multi-value\n  background $bg\n  color $primary\n\n.select__multi-value__label\n  color $primary\n\n.select__multi-value__remove:hover\n  color #fff\n  background $bg\n",".modal\n  animation animateopacity 0.2s ease-out\n  background-color rgb(0, 0, 0)\n  background-color rgba(0, 0, 0, 0.6)\n  display flex\n  height 100%\n  left 0\n  overflow auto\n  position fixed\n  top 0\n  width 100%\n  z-index 9999999999\n\n.modal h3\n  font-size 18px\n  font-weight 100\n  margin 0.6em 0\n\n#textureModal .modal-content\n  height calc(100% - 50px)\n  width calc(100% - 50px)\n\n.modal-content\n  animation animatetop 0.2s ease-out\n  animation-duration 0.2s\n  animation-name animatetop\n  background-color #232323\n  box-shadow 0 4px 8px 0 rgba(0, 0, 0, 0.5), 0 6px 20px 0 rgba(0, 0, 0, 0.5)\n  margin auto\n  overflow hidden\n  padding 0\n\n.close\n  color white\n  float right\n  font-size 28px\n  font-weight bold\n\n.close:hover,\n.close:focus\n  color #08f\n  cursor pointer\n  text-decoration none\n\n.modal-header\n  color white\n  padding 2px 16px\n\n.modal-body\n  overflow auto\n  padding 16px\n\n.modal-footer\n  color white\n  padding 2px 16px\n\n/* Gallery */\n.gallery\n  background #232323\n  display flex\n  flex-wrap wrap\n  margin 15px auto 0\n  max-height calc(100vh - 370px)\n  overflow auto\n  padding 15px 3px 3px\n\n.newimage .gallery\n  padding 16px\n\n.gallery li\n  border-radius 2px\n  box-shadow 0 0 6px rgba(0, 0, 0, 0.6)\n  cursor pointer\n  margin 8px\n  overflow hidden\n  width 155px\n\n.gallery li.selected,\n.gallery li:hover\n  box-shadow 0 0 0 2px #1eaaf1\n\n.gallery li .detail\n  background-color #323232\n  margin 0\n  min-height 60px\n  padding 3px 10px\n\n.preview\n  padding 10px\n  width 150px\n\n.preview input\n  display block\n  margin 8px 0\n  width 144px\n\n.preview button\n  width 155px\n\n.preview .detail .title\n  color #fff\n  display inline-block\n  max-width 155px\n  overflow hidden\n  text-overflow ellipsis\n  white-space nowrap\n\n.gallery li.selected .detail,\n.gallery li:hover .detail\n  background-color #444\n\n.gallery li .detail span\n  color #777\n  display block\n  margin-top 4px\n  overflow hidden\n  text-overflow ellipsis\n  white-space nowrap\n  width 140px\n\n.gallery li.selected .detail span,\n.gallery li:hover .detail span\n  color #888\n\n.gallery li .detail span.title\n  color #fff !important\n\n.modal button\n  appearance none\n  border-radius 0\n  box-shadow none\n  cursor pointer\n  display inline-block\n  font-size 12px\n  line-height 1.8\n  margin 0 10px 0 0\n  padding 5px 10px\n\n.modal button:focus\n  outline none\n\n.modal button\n  background-color #1eaaf1\n  border none\n  color #fff\n\n.modal button:hover,\n.modal button.hover\n  background-color #346392\n  text-shadow -1px 1px #27496d\n\n.modal button:active,\n.modal button.active\n  background-color #27496d\n  text-shadow -1px 1px #193047\n\n.modal button:disabled\n  background-color #888\n  cursor none\n\n.newimage\n  background-color #323232\n  color #bcbcbc\n  display flex\n  font-size 13px\n  justify-content space-between\n  margin-top 10px\n  overflow auto\n  padding 10px\n\n.newimage input\n  color #1eaaf1\n  padding 3px 5px\n\n.texture canvas + input\n  margin-left 5px\n\n.texture svg\n  padding-right 5px\n\n.uploader-normal-button .hidden\n  display none\n\n.assets.search\n  position relative\n  margin-top 10px\n  width 200px\n\n.assets.search svg\n  position absolute\n  right 0px\n  top 5px\n\n.new_asset_options\n  margin 10px\n\n.new_asset_options > ul\n  margin-left 10px\n  padding 5px\n\n.new_asset_options > ul > li\n  padding 10px 0\n\n.new_asset_options .imageUrl\n  margin-left 5px\n  width 350px\n\n.texture canvas\n  border 1px solid $bglight\n  cursor pointer\n","@import './lib';\n\n#viewportBar\n  align-items center\n  background-color $bg\n  color $white\n  display flex\n  flex-grow 2\n  height 32px\n  font-size 15px\n  justify-content space-between\n  left 0\n  margin 0 auto\n  right 0\n  top 0\n\n.toolbarButtons\n  display flex\n  align-items center\n  gap 6px\n\n  *\n    margin-left 0 !important\n    vertical-align middle\n\n  a.button\n    & svg\n      padding 8px\n\n    &:not(.active) svg:hover\n      background-color $grayhover\n\n  .active svg\n    background-color $primary\n    color #fff\n\n  .active:hover svg\n    color #fff !important\n\n.local-transform\n  padding-left 10px\n  padding-right 20px\n\n.local-transform label\n  color $lightgray\n  padding-left 5px\n\n.local-transform a.button\n  padding-top 0\n\n#cameraSelect\n  cursor pointer\n  width 120px\n  .select__dropdown-indicator\n    padding-left 3px\n    padding-right 3px\n\n#cameraToolbar\n  margin-left 5px\n  align-items center\n  display flex\n  a\n    margin-right 10px\n  .select__control\n    background none\n  .select__single-value\n    color $white\n    &:hover\n      color $primary\n\n#viewportHud\n  display none\n  +media--1024()\n    display block\n","@import './lib';\n\n.Select-control\n  background-color #222 !important\n  border none\n  border-radius 0\n  color $primary\n  font-family $monosapce\n\n.Select-menu-outer\n  border none\n\n.Select-menu-outer .is-focused\n  background-color $primary !important\n  color $white\n\n.Select-option\n  background-color #222 !important\n\n.select-widget\n  display inline-block\n  width 157px\n\n.Select-placeholder,\n.Select--single > .Select-control .Select-value\n  color $primary !important\n\n.Select-value-label\n  color $primary !important\n"],"sourceRoot":""}]);
+`, "",{"version":3,"sources":["webpack://./src/style/lib.styl","webpack://./src/style/index.styl","webpack://./src/style/scenegraph.styl","webpack://./src/style/components.styl","webpack://./src/style/entity.styl","webpack://./src/style/help.styl","webpack://./src/style/select.styl","webpack://./src/style/textureModal.styl","webpack://./src/style/viewport.styl","webpack://./src/style/widgets.styl"],"names":[],"mappings":"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","sourcesContent":["$primary=#1faaf2\r\n$primaryhover=lighten(#1faaf2, 35%)\r\n\r\n$bg=#242424\r\n$bgdark=#1d1d1d\r\n$bglight=#333\r\n$bglighter=#393939\r\n\r\n$red=#92374d\r\n$green=#514b23\r\n$orange=#d66853\r\n\r\n$black=#222\r\n$gray=#262626\r\n$grayalt=#323232\r\n$grayhover=#444\r\n\r\n$lightgray=#AAA\r\n$white=#c3c3c3\r\n\r\n$normalfont=system-ui, BlinkMacSystemFont, -apple-system, \"Segoe UI\", Helvetica, Arial, sans-serif\r\n$monospace=system-ui, BlinkMacSystemFont, -apple-system, \"Segoe UI\", Helvetica, Arial, sans-serif\r\n\r\nmedia--1024() {\r\n  @media (min-width: 1024px) {\r\n    {block}\r\n  }\r\n}\r\n\r\n/* CSS rules from the original FontAwesomeIcon component */\r\nsvg:not(:root).svg-inline--fa, svg:not(:host).svg-inline--fa {\r\n  overflow: visible;\r\n  box-sizing: content-box;\r\n}\r\n\r\n.svg-inline--fa {\r\n  display: inline-block;\r\n  height: 1em;\r\n  overflow: visible;\r\n  vertical-align: -0.125em;\r\n}","@import './lib';\r\n\r\nbody.aframe-inspector-opened,\r\n.toggle-edit,\r\n.sponsor-btn\r\n  font-family BlinkMacSystemFont, -apple-system, \"Segoe UI\", Helvetica, Arial, sans-serif\r\n\r\n.wf-roboto-n4-active body.aframe-inspector-opened,\r\n.wf-roboto-n4-active .toggle-edit,\r\n.wf-roboto-n4-active .sponsor-btn\r\n  font-family BlinkMacSystemFont, -apple-system, \"Segoe UI\", Helvetica, Arial, sans-serif\r\n\r\nbody.aframe-inspector-opened\r\n  background $bgdark\r\n  color #fff\r\n  font-size 12px\r\n  margin 0\r\n  overflow hidden\r\n\r\n#aframeInspector\r\n  @import './scenegraph';\r\n  @import './components';\r\n  @import './entity';\r\n  @import './help';\r\n  @import './select';\r\n  @import './textureModal';\r\n  @import './viewport';\r\n  @import './widgets';\r\n\r\n  .Select,\r\n  code,\r\n  pre,\r\n  input,\r\n  textarea,\r\n  select\r\n    font-family $monospace\r\n    font-size 13px\r\n\r\n  .wf-robotomono-n4-active .Select,\r\n  .wf-robotomono-n4-active code,\r\n  .wf-robotomono-n4-active pre,\r\n  .wf-robotomono-n4-active input,\r\n  .wf-robotomono-n4-active textarea,\r\n  .wf-robotomono-n4-active select\r\n    font-family Roboto Mono, Consolas, Andale Mono, Monaco, Courier New, monospace\r\n\r\n  hr\r\n    border 0\r\n    border-top 1px solid #ccc\r\n\r\n  a\r\n    cursor pointer\r\n\r\n  button\r\n    position relative\r\n\r\n  code\r\n    font-family Consolas, Andale Mono, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace\r\n\r\n  textarea\r\n    tab-size 4\r\n    white-space pre\r\n    word-wrap normal\r\n\r\n  textarea.success\r\n    border-color #8b8 !important\r\n\r\n  textarea.fail\r\n    background-color rgba(255, 0, 0, 0.05)\r\n    border-color #f00 !important\r\n\r\n  textarea,\r\n  input\r\n    outline none /* osx */\r\n\r\n  .gltfIcon img\r\n    box-sizing content-box\r\n    display inline\r\n    height 20px\r\n    left 5px\r\n    padding 0 5px\r\n    position relative\r\n    top 4px\r\n    vertical-align baseline\r\n    width 20px\r\n\r\n  #scenegraph,\r\n  #rightPanel\r\n    z-index 9998\r\n\r\n  #sidebar,\r\n  #scenegraph,\r\n    .panel\r\n      cursor default\r\n      user-select none\r\n\r\n  .toggle-edit\r\n    background-color $red\r\n    box-sizing content-box\r\n    color #FAFAFA\r\n    font-size 13px\r\n    left 3px\r\n    line-height 16px\r\n    margin 0\r\n    padding 6px 10px\r\n    position fixed\r\n    text-align center\r\n    text-decoration none\r\n    top 3px\r\n    width 100px\r\n    z-index 999999999\r\n\r\n  .toggle-edit:hover\r\n    background-color rgb(228, 43, 90)\r\n\r\n  .try-editor-btn\r\n    background-color $red\r\n    box-sizing content-box\r\n    color #FAFAFA\r\n    font-size 16px\r\n    line-height 24px\r\n    margin 0\r\n    padding 6px 10px\r\n    text-align center\r\n    text-decoration none\r\n    width 200px\r\n    display flex\r\n    gap 5px\r\n    justify-content center\r\n\r\n  .try-editor-btn:hover\r\n    background-color rgb(228, 43, 90)\r\n    color #FAFAFA\r\n\r\n  .sponsor-btn\r\n    background-color #ffffff\r\n    box-sizing content-box\r\n    color #000000\r\n    font-size 13px\r\n    left 127px\r\n    line-height 16px\r\n    margin 0\r\n    padding 6px 10px\r\n    position fixed\r\n    text-align center\r\n    text-decoration none\r\n    top 3px\r\n    width 80px\r\n    z-index 999999999\r\n    display flex\r\n    gap 5px\r\n    justify-content center\r\n\r\n    svg\r\n      fill currentColor\r\n      color rgb(219, 97, 162)\r\n\r\n  .sponsor-btn:hover\r\n    background-color rgb(228, 43, 90)\r\n    color #FAFAFA\r\n\r\n  input\r\n    background-color transparent\r\n    border 1px solid #555\r\n    color #fff\r\n\r\n  input,\r\n  .texture canvas\r\n    transition 0.1s background-color ease-in-out, 0.1s border-color ease-in-out, 0.1s color ease-in-out\r\n\r\n  input[type=text],\r\n  input[type=number],\r\n  input.string,\r\n  input.number\r\n    min-height 14px\r\n    outline none\r\n\r\n  input[type=\"checkbox\"]\r\n    appearance auto\r\n    cursor pointer\r\n    margin 0\r\n    height 18px\r\n    width 18px\r\n\r\n  input[type=\"checkbox\"]:focus\r\n    box-shadow none\r\n\r\n  input.number\r\n    background-color transparent !important\r\n    border 0\r\n    color #2cb7ff !important\r\n    cursor col-resize\r\n    font-size 13px\r\n    padding 2px\r\n\r\n  input.stringfocus,\r\n  input.numberfocus\r\n    border 1px solid #20b1fb\r\n    color #fff\r\n    cursor auto\r\n\r\n  input.error\r\n    border 1px solid #a00\r\n\r\n  #sidebar\r\n    background $bg\r\n    width 331px\r\n\r\n  #sidebar *\r\n    vertical-align middle\r\n\r\n  input,\r\n  textarea,\r\n  select\r\n    background $black\r\n    border 1px solid transparent\r\n    color #888\r\n\r\n  select\r\n    background $bglighter\r\n\r\n  input[type=color]\r\n    background-color #333\r\n    border 1px solid #111\r\n    height 28px\r\n    cursor pointer\r\n\r\n  input[type=color]\r\n    cursor pointer\r\n    height 25px\r\n    padding 0\r\n    width 50px\r\n\r\n  /* Note these vendor-prefixed selectors cannot be grouped! */\r\n  input[type=color]-webkit-color-swatch\r\n    border 0  /* To remove the gray border. */\r\n\r\n  input[type=color]-webkit-color-swatch-wrapper\r\n    padding 0  /* To remove the inner padding. */\r\n\r\n  input[type=color]-moz-color-swatch\r\n    border 0\r\n\r\n  input[type=color]-moz-focus-inner\r\n    border 0  /* To remove the inner border (specific to Firefox). */\r\n    padding 0\r\n\r\n  .hidden\r\n    visibility hidden\r\n\r\n  a.button\r\n    color #bcbcbc\r\n    font-size 16px\r\n    margin-left 10px\r\n    text-decoration none\r\n\r\n    &:hover\r\n      color $primary\r\n\r\n  @keyframes animateopacity\r\n    from { opacity: 0 }\r\n    to { opacity: 1 }\r\n\r\n  .hide\r\n    display none\r\n\r\n  .a-canvas.state-dragging\r\n    cursor grabbing\r\n\r\n  #rightPanel\r\n    align-items stretch\r\n    display flex\r\n    justify-content flex-end\r\n\r\n  #inspectorContainer\r\n    display flex\r\n    justify-content space-between\r\n    left 0\r\n    height 100%\r\n    pointer-events none\r\n    position fixed\r\n    top 0\r\n    width 100%\r\n    z-index 999999\r\n\r\n  #scenegraph,\r\n  #viewportBar,\r\n  #rightPanel\r\n    pointer-events all\r\n\r\n  .aframe-inspector-opened a-scene .a-canvas\r\n    background-color #191919\r\n    z-index 9998\r\n\r\n  .toggle-sidebar\r\n    align-items center\r\n    display flex\r\n    height 100%\r\n    position absolute\r\n    z-index 9998\r\n\r\n    a\r\n      background-color #262626\r\n      color #bcbcbc\r\n      padding 5px\r\n      z-index 9998\r\n\r\n    a.hover\r\n      background-color #1faaf2\r\n      color #fff\r\n\r\n  .toggle-sidebar.left\r\n    top 0\r\n    left 0\r\n\r\n  .toggle-sidebar.right\r\n    top 0\r\n    right 0\r\n","@import './lib';\r\n\r\n#toolbar\r\n  background-color $bg\r\n\r\n  .toolbarActions\r\n    padding 0 0 5px\r\n    display flex\r\n    align-items baseline\r\n\r\n    a.disabled\r\n      color #666\r\n      cursor default\r\n\r\n    .helpButtonContainer\r\n      flex-grow 1\r\n      padding-right 10px\r\n      text-align right\r\n\r\n#scenegraph\r\n  background $bg\r\n  border-top 1px solid #111\r\n  display flex\r\n  flex-direction column\r\n  overflow auto\r\n  padding-top 32px\r\n  width 230px\r\n\r\n  .entity\r\n    background $bg\r\n    cursor pointer\r\n    display flex\r\n    justify-content space-between\r\n    padding 3px\r\n    width 100%\r\n    white-space nowrap\r\n\r\n    &:hover\r\n      background #1d2f39\r\n\r\n    &.active\r\n      background-color #155373\r\n      color #fff\r\n      .component:hover\r\n        color #1888c1\r\n      .entityActions\r\n        display inline\r\n\r\n    &.novisible\r\n      &.active\r\n        span,\r\n        svg,\r\n        .collapsespace,\r\n        .id\r\n          color #999\r\n\r\n      &:not(.active)\r\n        span,\r\n        svg,\r\n        .collapsespace,\r\n        .id\r\n          color #626262\r\n\r\n  .component:hover\r\n    color #1faaf2\r\n\r\n  .entityIcons\r\n    margin-left 2px\r\n\r\n  .entityActions\r\n    display none\r\n    margin 0 14px\r\n\r\n    .button\r\n      color #fff\r\n      font-size 12px\r\n      margin-left 6px\r\n\r\n  svg\r\n    color #CCC\r\n\r\n  .toolbarActions svg:hover,\r\n  .entityActions svg:hover\r\n    color $primary\r\n\r\n  .active svg\r\n    color #FAFAFA\r\n\r\n  .id\r\n    color #ccc\r\n\r\n  .option.active .id\r\n    color #fff\r\n\r\n  .collapsespace\r\n    color #eee\r\n    display inline-block\r\n    text-align center\r\n    width 14px\r\n\r\n  .fa-eye\r\n    color #bbb\r\n\r\n  .icons a.button\r\n    color #fff\r\n\r\n  .search\r\n    padding 5px\r\n    font-size 16px\r\n    position relative\r\n\r\n    input\r\n      color $white\r\n      background $bgdark\r\n      border-radius 5px\r\n      height 22px\r\n      text-indent 10px\r\n      width 216px\r\n\r\n    >svg, a.button\r\n      position absolute\r\n      right 14px\r\n      top 10px\r\n\r\n  .outliner\r\n    background $bg\r\n    color $white\r\n    cursor default\r\n    flex 1 1 auto\r\n    font-size 13px\r\n    height calc(100% - 98px)\r\n    line-height normal\r\n    outline none\r\n    overflow-y auto\r\n    padding 0\r\n    width 230px\r\n\r\n.scenegraph-bottom\r\n  background-color #323232\r\n  border-top 1px solid #111\r\n  bottom 10\r\n  height 40px\r\n  left 0\r\n  z-index 100\r\n\r\n  a\r\n    float right\r\n    margin 10px\r\n","@import './lib';\r\n\r\n.components\r\n  background-color $bg\r\n  color $white\r\n  height 100%\r\n  overflow auto\r\n  position fixed\r\n  width 331px\r\n\r\n.collapsible-header\r\n  align-items center\r\n  display flex\r\n  justify-content space-between\r\n  .entityPrint\r\n    color #fff\r\n\r\n.collapsible-content\r\n  padding 5px 0\r\n\r\n.componentTitle span\r\n  max-width 200px\r\n  overflow hidden\r\n  text-overflow ellipsis\r\n  text-transform uppercase\r\n  white-space nowrap\r\n  color #fff\r\n  font-weight 600\r\n  vertical-align bottom !important\r\n\r\n.collapsible .static\r\n  background $bglight\r\n  border-bottom 2px solid $bg\r\n  box-sizing content-box\r\n  cursor pointer\r\n  height 16px\r\n  padding 8px 10px 12px 10px\r\n  vertical-align bottom\r\n  font-size 13px\r\n  &:hover\r\n    background $bglighter\r\n/*\r\n.collapsible\r\n  &.collapsed\r\n    background-color $grayalt\r\n    .static,\r\n    .componentHeaderActions\r\n      color #dedede\r\n    &:hover\r\n      background-color $grayhover\r\n*/\r\n.collapsible .menu\r\n  text-align right\r\n\r\n.collapsible .menuafter\r\n  color #bbb\r\n  content '\\2807'\r\n  font-size 12px\r\n  padding 5px\r\n  text-align right\r\n\r\n.collapsible .static\r\n  margin 0\r\n\r\n.collapsible .static .collapse-button\r\n  border 6px solid transparent\r\n  float left\r\n  height 0\r\n  margin-right 10px\r\n  margin-left 2px\r\n  width 0\r\n\r\n.collapsible.collapsed .static .collapse-button\r\n  border-left-color $white\r\n  margin-top 4px\r\n\r\n.collapsible:not(.collapsed) .static .collapse-button\r\n  border-top-color $white\r\n  margin-top 7px\r\n\r\n.propertyRow\r\n  align-items center\r\n  display flex\r\n  font-size 13px\r\n  min-height 30px\r\n  padding 2px 15px\r\n\r\n  .text\r\n    cursor default\r\n    display inline-block\r\n    overflow hidden\r\n    padding-right 10px\r\n    text-overflow ellipsis\r\n    vertical-align middle\r\n    width 118px\r\n\r\n  input.number\r\n    width 40px\r\n\r\n  .vec2 input.number,\r\n  .vec3 input.number\r\n    width 40px\r\n\r\n  .vec4 input.number\r\n    width 34px\r\n\r\n  .vec2, .vec3, vec4\r\n    display inline\r\n\r\n  .map_value\r\n    margin 0 0 0 5px\r\n    width 68px\r\n\r\n  .Select-control\r\n    font-size 11px\r\n    height 24px\r\n\r\n  .Select-placeholder,\r\n  .Select--single > .Select-control .Select-value\r\n    line-height 19px\r\n\r\n  .Select-input\r\n    height 22px\r\n\r\n  input[type=text],\r\n  input[type=number],\r\n  input.string,\r\n  input.number\r\n    background $bgdark\r\n    color #1faaf2\r\n    min-height 26px\r\n    padding-bottom 1px\r\n    padding-left 5px\r\n    padding-right 5px\r\n    padding-top 1px\r\n    &:last-child\r\n      padding-right 0\r\n\r\n  input.string\r\n    padding-left 8px\r\n    box-sizing border-box\r\n    width 165px\r\n\r\n  input[type=text]:focus,\r\n  input.string:focus\r\n    box-shadow none\r\n\r\n  .color_value\r\n    margin 0 0 0 5px\r\n    width 68px\r\n    letter-spacing 1px\r\n\r\n.propertyRowDefined .text\r\n  color #FAFAFA\r\n  font-weight 500\r\n\r\n.components *\r\n  vertical-align middle\r\n\r\nspan.subcomponent\r\n  color #999\r\n  float none !important\r\n  margin-left 10px\r\n  vertical-align top !important\r\n\r\n#addComponentContainer\r\n  align-items center\r\n  display flex\r\n  flex-direction column\r\n  justify-content center\r\n  padding 20px 10px\r\n  background $bgdark\r\n\r\n  #addComponent\r\n    text-align left\r\n    width 200px\r\n    .select__control\r\n      background #161616\r\n      height 35px\r\n      color $primary\r\n\r\n  #addComponentHeader\r\n    font-size 15px\r\n    margin 5px 0 10px 0\r\n\r\n  input[type=text]:focus\r\n    box-shadow none\r\n\r\n.Select-menu-outer .is-focused span\r\n  color #fff\r\n\r\n.component-title\r\n  align-items center\r\n  display flex\r\n\r\n#componentEntityHeader\r\n  .collapsible-header\r\n    bottom 4px\r\n    position relative\r\n  .collapse-button\r\n    display none\r\n  .static\r\n    height 13px\r\n  .entityPrint\r\n    font-size 15px\r\n    padding-left 5px\r\n  .entityName\r\n    max-width 160px\r\n    top 0\r\n  .entityIcons\r\n    color #FAFAFA\r\n\r\n#mixinSelect\r\n  width 160px\r\n\r\n.propertyRow .texture\r\n  display flex\r\n  input\r\n    margin-left 0\r\n    width 120px\r\n\r\n#componentEntityHeader .gltfIcon img\r\n  top 0","@import './lib';\r\n\r\n.entityPrint\r\n  font-family $normalfont\r\n  line-height 1.15em\r\n\r\n.entityName\r\n  display inline-block\r\n  overflow hidden\r\n  position relative\r\n  text-overflow ellipsis\r\n  top 3px\r\n  white-space nowrap\r\n\r\n[data-entity-name-type=\"id\"]\r\n  color $red\r\n\r\n[data-entity-name-type=\"class\"]\r\n  color $green\r\n\r\n[data-entity-name-type=\"mixin\"]\r\n  color $orange\r\n",".help-lists\r\n  display flex\r\n  justify-content space-around\r\n\r\n.help-list\r\n  list-style none\r\n  margin 0\r\n  padding 0 0 10px\r\n  width 350px\r\n\r\n.help-list li\r\n  margin-right 40px\r\n\r\n.help-key-unit\r\n  line-height 1.8\r\n  margin-right 2em\r\n  padding 5px 0\r\n\r\n.help-key\r\n  bottom 2px\r\n  margin-right 4px\r\n  min-width 60px\r\n  position relative\r\n\r\n.help-key span\r\n  background-color #2e2e2e\r\n  background-repeat repeat-x\r\n  border 1px solid #666\r\n  border-radius 3px\r\n  box-shadow 0 0 5px #000\r\n  color #999\r\n  display inline-block\r\n  font-size 12px\r\n  padding 0 8px\r\n  text-align center\r\n\r\n.help-key-def\r\n  color #bbb\r\n  display inline-block\r\n  margin-left 1em\r\n","@import './lib';\r\n\r\n.select__control\r\n  border 0\r\n  border-radius 0\r\n  cursor pointer\r\n  min-height 26px\r\n  font-family $monospace\r\n  font-size 13px\r\n\r\n.select__indicator\r\n  height 26px\r\n\r\n.select__indicator-separator\r\n  display none\r\n\r\n.select__input\r\n  min-height auto !important\r\n\r\n.select__control,\r\n.select__menu\r\n  background $bgdark\r\n\r\n.select__option\r\n  padding 5px 10px\r\n\r\n.select__placeholder,\r\n.select__menu\r\n  color $white\r\n\r\n.select__single-value\r\n  color $primary\r\n\r\n.select__control--is-focused\r\n  box-shadow none !important\r\n\r\n.select__option\r\n  cursor pointer\r\n\r\n.select__label\r\n  font-size 11px\r\n\r\n.select__option--is-focused\r\n  background #155373\r\n\r\n.select__value-container\r\n  height 26px\r\n  position static\r\n  &.select__value-container--is-multi\r\n    height auto\r\n    padding 6px\r\n\r\n.select__dropdown-indicator\r\n  padding 3px 8px\r\n\r\n.select__multi-value\r\n  background $bg\r\n  color $primary\r\n\r\n.select__multi-value__label\r\n  color $primary\r\n\r\n.select__multi-value__remove:hover\r\n  color #fff\r\n  background $bg\r\n",".modal\r\n  animation animateopacity 0.2s ease-out\r\n  background-color rgb(0, 0, 0)\r\n  background-color rgba(0, 0, 0, 0.6)\r\n  display flex\r\n  height 100%\r\n  left 0\r\n  overflow auto\r\n  position fixed\r\n  top 0\r\n  width 100%\r\n  z-index 9999999999\r\n\r\n.modal h3\r\n  font-size 18px\r\n  font-weight 100\r\n  margin 0.6em 0\r\n\r\n#textureModal .modal-content\r\n  height calc(100% - 50px)\r\n  width calc(100% - 50px)\r\n\r\n.modal-content\r\n  animation animatetop 0.2s ease-out\r\n  animation-duration 0.2s\r\n  animation-name animatetop\r\n  background-color #232323\r\n  box-shadow 0 4px 8px 0 rgba(0, 0, 0, 0.5), 0 6px 20px 0 rgba(0, 0, 0, 0.5)\r\n  margin auto\r\n  overflow hidden\r\n  padding 0\r\n\r\n.close\r\n  color white\r\n  float right\r\n  font-size 28px\r\n  font-weight bold\r\n\r\n.close:hover,\r\n.close:focus\r\n  color #08f\r\n  cursor pointer\r\n  text-decoration none\r\n\r\n.modal-header\r\n  color white\r\n  padding 2px 16px\r\n\r\n.modal-body\r\n  overflow auto\r\n  padding 16px\r\n\r\n.modal-footer\r\n  color white\r\n  padding 2px 16px\r\n\r\n/* Gallery */\r\n.gallery\r\n  background #232323\r\n  display flex\r\n  flex-wrap wrap\r\n  margin 15px auto 0\r\n  max-height calc(100vh - 370px)\r\n  overflow auto\r\n  padding 15px 3px 3px\r\n\r\n.newimage .gallery\r\n  padding 16px\r\n\r\n.gallery li\r\n  border-radius 2px\r\n  box-shadow 0 0 6px rgba(0, 0, 0, 0.6)\r\n  cursor pointer\r\n  margin 8px\r\n  overflow hidden\r\n  width 155px\r\n\r\n.gallery li.selected,\r\n.gallery li:hover\r\n  box-shadow 0 0 0 2px #1eaaf1\r\n\r\n.gallery li .detail\r\n  background-color #323232\r\n  margin 0\r\n  min-height 60px\r\n  padding 3px 10px\r\n\r\n.preview\r\n  padding 10px\r\n  width 150px\r\n\r\n.preview input\r\n  display block\r\n  margin 8px 0\r\n  width 144px\r\n\r\n.preview button\r\n  width 155px\r\n\r\n.preview .detail .title\r\n  color #fff\r\n  display inline-block\r\n  max-width 155px\r\n  overflow hidden\r\n  text-overflow ellipsis\r\n  white-space nowrap\r\n\r\n.gallery li.selected .detail,\r\n.gallery li:hover .detail\r\n  background-color #444\r\n\r\n.gallery li .detail span\r\n  color #777\r\n  display block\r\n  margin-top 4px\r\n  overflow hidden\r\n  text-overflow ellipsis\r\n  white-space nowrap\r\n  width 140px\r\n\r\n.gallery li.selected .detail span,\r\n.gallery li:hover .detail span\r\n  color #888\r\n\r\n.gallery li .detail span.title\r\n  color #fff !important\r\n\r\n.modal button\r\n  appearance none\r\n  border-radius 0\r\n  box-shadow none\r\n  cursor pointer\r\n  display inline-block\r\n  font-size 12px\r\n  line-height 1.8\r\n  margin 0 10px 0 0\r\n  padding 5px 10px\r\n\r\n.modal button:focus\r\n  outline none\r\n\r\n.modal button\r\n  background-color #1eaaf1\r\n  border none\r\n  color #fff\r\n\r\n.modal button:hover,\r\n.modal button.hover\r\n  background-color #346392\r\n  text-shadow -1px 1px #27496d\r\n\r\n.modal button:active,\r\n.modal button.active\r\n  background-color #27496d\r\n  text-shadow -1px 1px #193047\r\n\r\n.modal button:disabled\r\n  background-color #888\r\n  cursor none\r\n\r\n.newimage\r\n  background-color #323232\r\n  color #bcbcbc\r\n  display flex\r\n  font-size 13px\r\n  justify-content space-between\r\n  margin-top 10px\r\n  overflow auto\r\n  padding 10px\r\n\r\n.newimage input\r\n  color #1eaaf1\r\n  padding 3px 5px\r\n\r\n.texture canvas + input\r\n  margin-left 5px\r\n\r\n.texture svg\r\n  padding-right 5px\r\n\r\n.uploader-normal-button .hidden\r\n  display none\r\n\r\n.assets.search\r\n  position relative\r\n  margin-top 10px\r\n  width 200px\r\n\r\n.assets.search svg\r\n  position absolute\r\n  right 0px\r\n  top 5px\r\n\r\n.new_asset_options\r\n  margin 10px\r\n\r\n.new_asset_options > ul\r\n  margin-left 10px\r\n  padding 5px\r\n\r\n.new_asset_options > ul > li\r\n  padding 10px 0\r\n\r\n.new_asset_options .imageUrl\r\n  margin-left 5px\r\n  width 350px\r\n\r\n.texture canvas\r\n  border 1px solid $bglight\r\n  cursor pointer\r\n","@import './lib';\r\n\r\n#viewportBar\r\n  align-items center\r\n  background-color $bg\r\n  color $white\r\n  display flex\r\n  flex-grow 2\r\n  height 32px\r\n  font-size 15px\r\n  justify-content space-between\r\n  left 0\r\n  margin 0 auto\r\n  right 0\r\n  top 0\r\n\r\n.toolbarButtons\r\n  display flex\r\n  align-items center\r\n  gap 6px\r\n\r\n  *\r\n    margin-left 0 !important\r\n    vertical-align middle\r\n\r\n  a.button\r\n    & svg\r\n      padding 8px\r\n\r\n    &:not(.active) svg:hover\r\n      background-color $grayhover\r\n\r\n  .active svg\r\n    background-color $primary\r\n    color #fff\r\n\r\n  .active:hover svg\r\n    color #fff !important\r\n\r\n.local-transform\r\n  padding-left 10px\r\n  padding-right 20px\r\n\r\n.local-transform label\r\n  color $lightgray\r\n  padding-left 5px\r\n\r\n.local-transform a.button\r\n  padding-top 0\r\n\r\n#cameraSelect\r\n  cursor pointer\r\n  width 120px\r\n  .select__dropdown-indicator\r\n    padding-left 3px\r\n    padding-right 3px\r\n\r\n#cameraToolbar\r\n  margin-left 5px\r\n  align-items center\r\n  display flex\r\n  a\r\n    margin-right 10px\r\n  .select__control\r\n    background none\r\n  .select__single-value\r\n    color $white\r\n    &:hover\r\n      color $primary\r\n\r\n#viewportHud\r\n  display none\r\n  +media--1024()\r\n    display block\r\n","@import './lib';\r\n\r\n.Select-control\r\n  background-color #222 !important\r\n  border none\r\n  border-radius 0\r\n  color $primary\r\n  font-family $monosapce\r\n\r\n.Select-menu-outer\r\n  border none\r\n\r\n.Select-menu-outer .is-focused\r\n  background-color $primary !important\r\n  color $white\r\n\r\n.Select-option\r\n  background-color #222 !important\r\n\r\n.select-widget\r\n  display inline-block\r\n  width 157px\r\n\r\n.Select-placeholder,\r\n.Select--single > .Select-control .Select-value\r\n  color $primary !important\r\n\r\n.Select-value-label\r\n  color $primary !important\r\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -51962,7 +52039,7 @@ var index =  react__WEBPACK_IMPORTED_MODULE_0__.useLayoutEffect ;
 /***/ ((module) => {
 
 "use strict";
-module.exports = "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhLS0gQ3JlYXRlZCB3aXRoIElua3NjYXBlIChodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy8pIC0tPgo8c3ZnIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6Y2M9Imh0dHA6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL25zIyIgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIiB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnNvZGlwb2RpPSJodHRwOi8vc29kaXBvZGkuc291cmNlZm9yZ2UubmV0L0RURC9zb2RpcG9kaS0wLmR0ZCIgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiIHdpZHRoPSI4NjEuOTUzOTgiIGhlaWdodD0iNDUxLjk5OTAyIiB2aWV3Qm94PSIwIDAgMjI4LjA1ODY2IDExOS41OTE0IiB2ZXJzaW9uPSIxLjEiIGlkPSJzdmcxMDQwIiBpbmtzY2FwZTp2ZXJzaW9uPSIwLjkyLjAgcjE1Mjk5IiBzb2RpcG9kaTpkb2NuYW1lPSJnaXRmLnN2ZyI+CiAgPGRlZnMgaWQ9ImRlZnMxMDM0Ii8+CiAgPHNvZGlwb2RpOm5hbWVkdmlldyBpZD0iYmFzZSIgcGFnZWNvbG9yPSIjZmZmZmZmIiBib3JkZXJjb2xvcj0iIzY2NjY2NiIgYm9yZGVyb3BhY2l0eT0iMS4wIiBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMC4wIiBpbmtzY2FwZTpwYWdlc2hhZG93PSIyIiBpbmtzY2FwZTp6b29tPSIwLjQ3NDgyNDY0IiBpbmtzY2FwZTpjeD0iMzMxLjkwNzgzIiBpbmtzY2FwZTpjeT0iNDQzLjU3MTM1IiBpbmtzY2FwZTpkb2N1bWVudC11bml0cz0ibW0iIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9ImxheWVyMSIgc2hvd2dyaWQ9ImZhbHNlIiBmaXQtbWFyZ2luLXRvcD0iMCIgZml0LW1hcmdpbi1sZWZ0PSIwIiBmaXQtbWFyZ2luLXJpZ2h0PSIwIiBmaXQtbWFyZ2luLWJvdHRvbT0iMCIgdW5pdHM9InB4IiBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjEyODAiIGlua3NjYXBlOndpbmRvdy1oZWlnaHQ9Ijc0NCIgaW5rc2NhcGU6d2luZG93LXg9Ii00IiBpbmtzY2FwZTp3aW5kb3cteT0iLTQiIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjEiLz4KICA8bWV0YWRhdGEgaWQ9Im1ldGFkYXRhMTAzNyI+CiAgICA8cmRmOlJERj4KICAgICAgPGNjOldvcmsgcmRmOmFib3V0PSIiPgogICAgICAgIDxkYzpmb3JtYXQ+aW1hZ2Uvc3ZnK3htbDwvZGM6Zm9ybWF0PgogICAgICAgIDxkYzp0eXBlIHJkZjpyZXNvdXJjZT0iaHR0cDovL3B1cmwub3JnL2RjL2RjbWl0eXBlL1N0aWxsSW1hZ2UiLz4KICAgICAgICA8ZGM6dGl0bGUvPgogICAgICA8L2NjOldvcms+CiAgICA8L3JkZjpSREY+CiAgPC9tZXRhZGF0YT4KICA8ZyBpbmtzY2FwZTpsYWJlbD0iTGF5ZXIgMSIgaW5rc2NhcGU6Z3JvdXBtb2RlPSJsYXllciIgaWQ9ImxheWVyMSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTE3LjE4MjcyLC0yMTUuNzY1MjQpIj4KICAgIDxnIGlkPSJnMTMyNyIgdHJhbnNmb3JtPSJtYXRyaXgoMC4yNjQ1ODMzMywwLDAsMC4yNjQ1ODMzMywtMS45MDc3NjIxLDIwOS40MTUyNCkiPgogICAgICA8ZyBpZD0iZzEyOTkiPgoJPGcgaWQ9ImcxMjg1Ij4KCQk8cGF0aCBpZD0icGF0aDEyODEiIGQ9Im0gNDE5LjY3MSw0MDMuNzI3IGMgMTQuNzU3LC0xNi41NTQgMjIuNTYxLC00MC43MzUgMjIuNTYxLC03My4zMTYgViAxNDguMzcgaCAtMzEuMTc0IHYgMjguNDggaCAtMC4zODUgYyAtNS45MDUsLTExLjAyOSAtMTQuMTEzLC0xOS4zMDMgLTI0LjYzMSwtMjQuODIzIC0xMC41MjQsLTUuNTE1IC0yMi4wNjksLTguMjc1IC0zNC42MzcsLTguMjc1IC0xNy4xOTMsMCAtMzEuNjkxLDMuMjcxIC00My40OSw5LjgxNCAtMTEuODA0LDYuNTQzIC0yMS4yOTksMTQuOTUgLTI4LjQ3OSwyNS4yMDkgLTcuMTg3LDEwLjI2NCAtMTIuMzE1LDIxLjU1MiAtMTUuMzk1LDMzLjg2OCAtMy4wNzksMTIuMzE1IC00LjYxOCwyNC4zNzggLTQuNjE4LDM2LjE3NyAwLDEzLjYwMyAxLjg1OCwyNi40OTYgNS41ODEsMzguNjc5IDMuNzE2LDEyLjE5IDkuMjk2LDIyLjkgMTYuNzQxLDMyLjEzNyA3LjQzOSw5LjIzNiAxNi42NzUsMTYuNTQ4IDI3LjcxLDIxLjkzNiAxMS4wMzUsNS4zODggMjMuOTk0LDguMDgyIDM4Ljg3Nyw4LjA4MiA2LjE1OCwwIDEyLjM3NiwtMC43NjkgMTguNjY1LC0yLjMwOSA2LjI5MSwtMS41MzkgMTIuMTksLTMuNzgyIDE3LjcxLC02LjczNSA1LjUxNCwtMi45NDYgMTAuNDUyLC02LjY2OSAxNC44MTcsLTExLjE2IDQuMzYsLTQuNDg3IDcuOTUsLTkuODEzIDEwLjc3NiwtMTUuOTcyIGggMC43NTcgdiAxMy4wODQgYyAwLDExLjI5MyAtMS4wOTQsMjEuNTUzIC0zLjI3MiwzMC43OSAtMi4xODIsOS4yMzcgLTUuNzEyLDE3LjEyNyAtMTAuNTgzLDIzLjY2OCAtNC44NzcsNi41NDMgLTExLjAzNSwxMS42NzIgLTE4LjQ3NCwxNS4zOTUgLTcuNDQ1LDMuNzE3IC0xNi41NDksNS41ODEgLTI3LjMyNSw1LjU4MSAtNS4zODksMCAtMTEuMDM1LC0wLjU3OSAtMTYuOTM1LC0xLjczMiAtMi4xMywtMC40MTYgLTQuMiwtMC45MjggLTYuMjExLC0xLjUzIC0yLjE4OCwtMC43NzIgLTQuMzU4LC0xLjU1NyAtNi41MSwtMi4zNTYgLTAuMiwtMC4wODUgLTAuMzk5LC0wLjE3MiAtMC41OTgsLTAuMjU5IHYgMC4wMzYgQyAyMzYuNjIyLDM2NC41ODMgMTgwLjk5MiwzMTAuOTA5IDE4MC45OTIsMjUwLjAwMyBjIDAsLTk3LjE0NyAxNDEuNTIzLC0xNzUuODk5IDMxNi4xLC0xNzUuODk5IDk3LjI1MywwIDE4NC40NTEsMjIuMTUgMjQyLjQzNiw2MC41OTMgQyA2NzYuMjQsNzAuMjgzIDU2Mi43NTcsMjUuMDIyIDQzMy4wMDUsMjUgMjM0LjI4MiwyNC45NjUgNzMuMTcsMTI1LjY3NCA3My4xNTMsMjQ5LjkzOCBjIC0wLjAxMiw4NC44MjEgNzUuMDQyLDE1OC42OTcgMTg1Ljg5MywxOTcuMDU4IDg4LjkxOSwzLjA0NCAxMzQuMDQ4LC0xMy40NTkgMTYwLjYyNSwtNDMuMjY5IHogTSA0MDYuMjQ4LDI3MS41MjYgYyAtMi4xODIsOS4yMzYgLTUuNTgsMTcuNTEyIC0xMC4xOTksMjQuODIzIC00LjYxNyw3LjMxNCAtMTAuNzE1LDEzLjIxOSAtMTguMjgsMTcuNzAzIC03LjU3MSw0LjQ5MyAtMTYuNzQyLDYuNzM1IC0yNy41MTcsNi43MzUgLTEwLjc3NywwIC0xOS43NjEsLTIuMjQyIC0yNi45NDEsLTYuNzM1IC03LjE4NiwtNC40ODQgLTEyLjk1OSwtMTAuMzkgLTE3LjMxOSwtMTcuNzAzIC00LjM2NiwtNy4zMTEgLTcuNDQ0LC0xNS40NTQgLTkuMjM3LC0yNC40MzkgLTEuNzk3LC04Ljk3OCAtMi42OTQsLTE3Ljk1NiAtMi42OTQsLTI2Ljk0IDAsLTkuNDg5IDEuMDg4LC0xOC42IDMuMjcxLC0yNy4zMjYgMi4xNzgsLTguNzE5IDUuNjQxLC0xNi40MTcgMTAuMzkyLC0yMy4wOTIgNC43NDUsLTYuNjY5IDEwLjgzNywtMTEuOTkxIDE4LjI4MSwtMTUuOTcyIDcuNDM5LC0zLjk3NSAxNi40MTcsLTUuOTY1IDI2Ljk0MSwtNS45NjUgMTAuMjU5LDAgMTguOTg0LDIuMDU3IDI2LjE3LDYuMTU4IDcuMTgsNC4xMDcgMTMuMDE5LDkuNTYxIDE3LjUxMSwxNi4zNTYgNC40ODYsNi44MDEgNy43NTgsMTQuNDMyIDkuODE0LDIyLjg5OSAyLjA1MSw4LjQ2NyAzLjA3OSwxNy4wNjYgMy4wNzksMjUuNzg2IDAsOS4yMzggLTEuMDk1LDE4LjQ3NSAtMy4yNzIsMjcuNzEyIHoiIGlua3NjYXBlOmNvbm5lY3Rvci1jdXJ2YXR1cmU9IjAiIHN0eWxlPSJmaWxsOiNmYWZhZmEiLz4KCgkJPHBhdGggaWQ9InBhdGgxMjgzIiBkPSJtIDQzNC44NDksNDIyLjQ4NSBjIC0xOC44NTQsMTcuMTEzIC01Mi41MzIsMzYuNjQ3IC05OC4zOTcsNDQuMzE2IDMwLjcwNyw1LjMzOSA2My4wNjUsOC4xOTQgOTYuNDksOC4xOTggMTI5LjIzNiwwLjAyNSAyNDIuNDI1LC00NS4wOTEgMzA1Ljg4MSwtMTA5LjA1NSAtNTcuOTg0LDM4LjIwNiAtMTQ0LjgzLDU5Ljk1MSAtMjQxLjcyOCw1OS45NTEgLTIzLjAxOCwwLjAwMiAtNDAuNjI2LC0wLjgwOSAtNjIuMjQ2LC0zLjQxIHoiIGlua3NjYXBlOmNvbm5lY3Rvci1jdXJ2YXR1cmU9IjAiIHN0eWxlPSJmaWxsOiNmYWZhZmEiLz4KCgk8L2c+CgoJPGcgaWQ9ImcxMjk1Ij4KCQk8ZyBpZD0iZzEyODkiPgoJCQk8cGF0aCBpZD0icGF0aDEyODciIGQ9Ik0gNjMzLjg0LDM0Ny45MDggSCA1ODYuODc1IFYgMTg5LjcwNSBoIC01OC45MjIgdiAtNDAuMjM0IGggMTY0LjgxIHYgNDAuMjM0IEggNjMzLjg0IFoiIGlua3NjYXBlOmNvbm5lY3Rvci1jdXJ2YXR1cmU9IjAiIHN0eWxlPSJmaWxsOiNmYWZhZmEiLz4KCgkJPC9nPgoKCQk8ZyBpZD0iZzEyOTMiPgoJCQk8cGF0aCBpZD0icGF0aDEyOTEiIGQ9Ik0gNzY0LjE3MywzNDcuOTA4IEggNzE3LjIwNiBWIDE0OS40NzEgaCAxNDQuOTg4IHYgNDAuMjM0IGggLTk4LjAyMSB2IDM3LjEyOCBoIDg1LjgwMyB2IDQwLjIzMyBoIC04NS44MDMgeiIgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCIgc3R5bGU9ImZpbGw6I2ZhZmFmYSIvPgoKCQk8L2c+CgoJPC9nPgoKCTxwYXRoIGlkPSJwYXRoMTI5NyIgZD0ibSA0NjkuNTU0LDEwMC4wMzEgaCAzMi43MTQgdiAyNDcuMzEzIGggLTMyLjcxNCB6IiBpbmtzY2FwZTpjb25uZWN0b3ItY3VydmF0dXJlPSIwIiBzdHlsZT0iZmlsbDojZmFmYWZhIi8+Cgo8L2c+CiAgICAgIDxnIGlkPSJnMTMwNSI+Cgk8cG9seWdvbiBpZD0icG9seWdvbjEzMDEiIHBvaW50cz0iODk1LjQzNSwxNTUuMjg5IDg5NS40MzUsMTc0LjQgODg5LjAxNywxNzQuNCA4ODkuMDE3LDE1NS4yODkgODgxLjY3LDE1NS4yODkgODgxLjY3LDE0OS43NjkgOTAyLjc4MiwxNDkuNzY5IDkwMi43ODIsMTU1LjI4OSA5MDIuNzgzLDE1NS4yODkgIiBzdHlsZT0iZmlsbDojZmFmYWZhIi8+CgoJPHBvbHlnb24gaWQ9InBvbHlnb24xMzAzIiBwb2ludHM9IjkxOS40MTEsMTY2LjE5IDkyMy42NTQsMTQ5Ljc2OSA5MzMuMTA3LDE0OS43NjkgOTMzLjEwNywxNzQuNCA5MjcuMDY5LDE3NC40IDkyNy4wNjksMTU1LjcwMyA5MjcuMDAxLDE1NS43MDMgOTIxLjgyNiwxNzQuNCA5MTYuOTI5LDE3NC40IDkxMS43NTIsMTU1LjcwMyA5MTEuNjgzLDE1NS43MDMgOTExLjY4MywxNzQuNCA5MDUuNjQ3LDE3NC40IDkwNS42NDcsMTQ5Ljc2OSA5MTUuMSwxNDkuNzY5IDkxOS4zNDIsMTY2LjE5ICIgc3R5bGU9ImZpbGw6I2ZhZmFmYSIvPgoKPC9nPgogICAgPC9nPgogIDwvZz4KPC9zdmc+Cg==";
+module.exports = "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8IS0tIENyZWF0ZWQgd2l0aCBJbmtzY2FwZSAoaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvKSAtLT4NCjxzdmcgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIiB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIiB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIgd2lkdGg9Ijg2MS45NTM5OCIgaGVpZ2h0PSI0NTEuOTk5MDIiIHZpZXdCb3g9IjAgMCAyMjguMDU4NjYgMTE5LjU5MTQiIHZlcnNpb249IjEuMSIgaWQ9InN2ZzEwNDAiIGlua3NjYXBlOnZlcnNpb249IjAuOTIuMCByMTUyOTkiIHNvZGlwb2RpOmRvY25hbWU9ImdpdGYuc3ZnIj4NCiAgPGRlZnMgaWQ9ImRlZnMxMDM0Ii8+DQogIDxzb2RpcG9kaTpuYW1lZHZpZXcgaWQ9ImJhc2UiIHBhZ2Vjb2xvcj0iI2ZmZmZmZiIgYm9yZGVyY29sb3I9IiM2NjY2NjYiIGJvcmRlcm9wYWNpdHk9IjEuMCIgaW5rc2NhcGU6cGFnZW9wYWNpdHk9IjAuMCIgaW5rc2NhcGU6cGFnZXNoYWRvdz0iMiIgaW5rc2NhcGU6em9vbT0iMC40NzQ4MjQ2NCIgaW5rc2NhcGU6Y3g9IjMzMS45MDc4MyIgaW5rc2NhcGU6Y3k9IjQ0My41NzEzNSIgaW5rc2NhcGU6ZG9jdW1lbnQtdW5pdHM9Im1tIiBpbmtzY2FwZTpjdXJyZW50LWxheWVyPSJsYXllcjEiIHNob3dncmlkPSJmYWxzZSIgZml0LW1hcmdpbi10b3A9IjAiIGZpdC1tYXJnaW4tbGVmdD0iMCIgZml0LW1hcmdpbi1yaWdodD0iMCIgZml0LW1hcmdpbi1ib3R0b209IjAiIHVuaXRzPSJweCIgaW5rc2NhcGU6d2luZG93LXdpZHRoPSIxMjgwIiBpbmtzY2FwZTp3aW5kb3ctaGVpZ2h0PSI3NDQiIGlua3NjYXBlOndpbmRvdy14PSItNCIgaW5rc2NhcGU6d2luZG93LXk9Ii00IiBpbmtzY2FwZTp3aW5kb3ctbWF4aW1pemVkPSIxIi8+DQogIDxtZXRhZGF0YSBpZD0ibWV0YWRhdGExMDM3Ij4NCiAgICA8cmRmOlJERj4NCiAgICAgIDxjYzpXb3JrIHJkZjphYm91dD0iIj4NCiAgICAgICAgPGRjOmZvcm1hdD5pbWFnZS9zdmcreG1sPC9kYzpmb3JtYXQ+DQogICAgICAgIDxkYzp0eXBlIHJkZjpyZXNvdXJjZT0iaHR0cDovL3B1cmwub3JnL2RjL2RjbWl0eXBlL1N0aWxsSW1hZ2UiLz4NCiAgICAgICAgPGRjOnRpdGxlLz4NCiAgICAgIDwvY2M6V29yaz4NCiAgICA8L3JkZjpSREY+DQogIDwvbWV0YWRhdGE+DQogIDxnIGlua3NjYXBlOmxhYmVsPSJMYXllciAxIiBpbmtzY2FwZTpncm91cG1vZGU9ImxheWVyIiBpZD0ibGF5ZXIxIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMTcuMTgyNzIsLTIxNS43NjUyNCkiPg0KICAgIDxnIGlkPSJnMTMyNyIgdHJhbnNmb3JtPSJtYXRyaXgoMC4yNjQ1ODMzMywwLDAsMC4yNjQ1ODMzMywtMS45MDc3NjIxLDIwOS40MTUyNCkiPg0KICAgICAgPGcgaWQ9ImcxMjk5Ij4NCgk8ZyBpZD0iZzEyODUiPg0KCQk8cGF0aCBpZD0icGF0aDEyODEiIGQ9Im0gNDE5LjY3MSw0MDMuNzI3IGMgMTQuNzU3LC0xNi41NTQgMjIuNTYxLC00MC43MzUgMjIuNTYxLC03My4zMTYgViAxNDguMzcgaCAtMzEuMTc0IHYgMjguNDggaCAtMC4zODUgYyAtNS45MDUsLTExLjAyOSAtMTQuMTEzLC0xOS4zMDMgLTI0LjYzMSwtMjQuODIzIC0xMC41MjQsLTUuNTE1IC0yMi4wNjksLTguMjc1IC0zNC42MzcsLTguMjc1IC0xNy4xOTMsMCAtMzEuNjkxLDMuMjcxIC00My40OSw5LjgxNCAtMTEuODA0LDYuNTQzIC0yMS4yOTksMTQuOTUgLTI4LjQ3OSwyNS4yMDkgLTcuMTg3LDEwLjI2NCAtMTIuMzE1LDIxLjU1MiAtMTUuMzk1LDMzLjg2OCAtMy4wNzksMTIuMzE1IC00LjYxOCwyNC4zNzggLTQuNjE4LDM2LjE3NyAwLDEzLjYwMyAxLjg1OCwyNi40OTYgNS41ODEsMzguNjc5IDMuNzE2LDEyLjE5IDkuMjk2LDIyLjkgMTYuNzQxLDMyLjEzNyA3LjQzOSw5LjIzNiAxNi42NzUsMTYuNTQ4IDI3LjcxLDIxLjkzNiAxMS4wMzUsNS4zODggMjMuOTk0LDguMDgyIDM4Ljg3Nyw4LjA4MiA2LjE1OCwwIDEyLjM3NiwtMC43NjkgMTguNjY1LC0yLjMwOSA2LjI5MSwtMS41MzkgMTIuMTksLTMuNzgyIDE3LjcxLC02LjczNSA1LjUxNCwtMi45NDYgMTAuNDUyLC02LjY2OSAxNC44MTcsLTExLjE2IDQuMzYsLTQuNDg3IDcuOTUsLTkuODEzIDEwLjc3NiwtMTUuOTcyIGggMC43NTcgdiAxMy4wODQgYyAwLDExLjI5MyAtMS4wOTQsMjEuNTUzIC0zLjI3MiwzMC43OSAtMi4xODIsOS4yMzcgLTUuNzEyLDE3LjEyNyAtMTAuNTgzLDIzLjY2OCAtNC44NzcsNi41NDMgLTExLjAzNSwxMS42NzIgLTE4LjQ3NCwxNS4zOTUgLTcuNDQ1LDMuNzE3IC0xNi41NDksNS41ODEgLTI3LjMyNSw1LjU4MSAtNS4zODksMCAtMTEuMDM1LC0wLjU3OSAtMTYuOTM1LC0xLjczMiAtMi4xMywtMC40MTYgLTQuMiwtMC45MjggLTYuMjExLC0xLjUzIC0yLjE4OCwtMC43NzIgLTQuMzU4LC0xLjU1NyAtNi41MSwtMi4zNTYgLTAuMiwtMC4wODUgLTAuMzk5LC0wLjE3MiAtMC41OTgsLTAuMjU5IHYgMC4wMzYgQyAyMzYuNjIyLDM2NC41ODMgMTgwLjk5MiwzMTAuOTA5IDE4MC45OTIsMjUwLjAwMyBjIDAsLTk3LjE0NyAxNDEuNTIzLC0xNzUuODk5IDMxNi4xLC0xNzUuODk5IDk3LjI1MywwIDE4NC40NTEsMjIuMTUgMjQyLjQzNiw2MC41OTMgQyA2NzYuMjQsNzAuMjgzIDU2Mi43NTcsMjUuMDIyIDQzMy4wMDUsMjUgMjM0LjI4MiwyNC45NjUgNzMuMTcsMTI1LjY3NCA3My4xNTMsMjQ5LjkzOCBjIC0wLjAxMiw4NC44MjEgNzUuMDQyLDE1OC42OTcgMTg1Ljg5MywxOTcuMDU4IDg4LjkxOSwzLjA0NCAxMzQuMDQ4LC0xMy40NTkgMTYwLjYyNSwtNDMuMjY5IHogTSA0MDYuMjQ4LDI3MS41MjYgYyAtMi4xODIsOS4yMzYgLTUuNTgsMTcuNTEyIC0xMC4xOTksMjQuODIzIC00LjYxNyw3LjMxNCAtMTAuNzE1LDEzLjIxOSAtMTguMjgsMTcuNzAzIC03LjU3MSw0LjQ5MyAtMTYuNzQyLDYuNzM1IC0yNy41MTcsNi43MzUgLTEwLjc3NywwIC0xOS43NjEsLTIuMjQyIC0yNi45NDEsLTYuNzM1IC03LjE4NiwtNC40ODQgLTEyLjk1OSwtMTAuMzkgLTE3LjMxOSwtMTcuNzAzIC00LjM2NiwtNy4zMTEgLTcuNDQ0LC0xNS40NTQgLTkuMjM3LC0yNC40MzkgLTEuNzk3LC04Ljk3OCAtMi42OTQsLTE3Ljk1NiAtMi42OTQsLTI2Ljk0IDAsLTkuNDg5IDEuMDg4LC0xOC42IDMuMjcxLC0yNy4zMjYgMi4xNzgsLTguNzE5IDUuNjQxLC0xNi40MTcgMTAuMzkyLC0yMy4wOTIgNC43NDUsLTYuNjY5IDEwLjgzNywtMTEuOTkxIDE4LjI4MSwtMTUuOTcyIDcuNDM5LC0zLjk3NSAxNi40MTcsLTUuOTY1IDI2Ljk0MSwtNS45NjUgMTAuMjU5LDAgMTguOTg0LDIuMDU3IDI2LjE3LDYuMTU4IDcuMTgsNC4xMDcgMTMuMDE5LDkuNTYxIDE3LjUxMSwxNi4zNTYgNC40ODYsNi44MDEgNy43NTgsMTQuNDMyIDkuODE0LDIyLjg5OSAyLjA1MSw4LjQ2NyAzLjA3OSwxNy4wNjYgMy4wNzksMjUuNzg2IDAsOS4yMzggLTEuMDk1LDE4LjQ3NSAtMy4yNzIsMjcuNzEyIHoiIGlua3NjYXBlOmNvbm5lY3Rvci1jdXJ2YXR1cmU9IjAiIHN0eWxlPSJmaWxsOiNmYWZhZmEiLz4NCg0KCQk8cGF0aCBpZD0icGF0aDEyODMiIGQ9Im0gNDM0Ljg0OSw0MjIuNDg1IGMgLTE4Ljg1NCwxNy4xMTMgLTUyLjUzMiwzNi42NDcgLTk4LjM5Nyw0NC4zMTYgMzAuNzA3LDUuMzM5IDYzLjA2NSw4LjE5NCA5Ni40OSw4LjE5OCAxMjkuMjM2LDAuMDI1IDI0Mi40MjUsLTQ1LjA5MSAzMDUuODgxLC0xMDkuMDU1IC01Ny45ODQsMzguMjA2IC0xNDQuODMsNTkuOTUxIC0yNDEuNzI4LDU5Ljk1MSAtMjMuMDE4LDAuMDAyIC00MC42MjYsLTAuODA5IC02Mi4yNDYsLTMuNDEgeiIgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCIgc3R5bGU9ImZpbGw6I2ZhZmFmYSIvPg0KDQoJPC9nPg0KDQoJPGcgaWQ9ImcxMjk1Ij4NCgkJPGcgaWQ9ImcxMjg5Ij4NCgkJCTxwYXRoIGlkPSJwYXRoMTI4NyIgZD0iTSA2MzMuODQsMzQ3LjkwOCBIIDU4Ni44NzUgViAxODkuNzA1IGggLTU4LjkyMiB2IC00MC4yMzQgaCAxNjQuODEgdiA0MC4yMzQgSCA2MzMuODQgWiIgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCIgc3R5bGU9ImZpbGw6I2ZhZmFmYSIvPg0KDQoJCTwvZz4NCg0KCQk8ZyBpZD0iZzEyOTMiPg0KCQkJPHBhdGggaWQ9InBhdGgxMjkxIiBkPSJNIDc2NC4xNzMsMzQ3LjkwOCBIIDcxNy4yMDYgViAxNDkuNDcxIGggMTQ0Ljk4OCB2IDQwLjIzNCBoIC05OC4wMjEgdiAzNy4xMjggaCA4NS44MDMgdiA0MC4yMzMgaCAtODUuODAzIHoiIGlua3NjYXBlOmNvbm5lY3Rvci1jdXJ2YXR1cmU9IjAiIHN0eWxlPSJmaWxsOiNmYWZhZmEiLz4NCg0KCQk8L2c+DQoNCgk8L2c+DQoNCgk8cGF0aCBpZD0icGF0aDEyOTciIGQ9Im0gNDY5LjU1NCwxMDAuMDMxIGggMzIuNzE0IHYgMjQ3LjMxMyBoIC0zMi43MTQgeiIgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCIgc3R5bGU9ImZpbGw6I2ZhZmFmYSIvPg0KDQo8L2c+DQogICAgICA8ZyBpZD0iZzEzMDUiPg0KCTxwb2x5Z29uIGlkPSJwb2x5Z29uMTMwMSIgcG9pbnRzPSI4OTUuNDM1LDE1NS4yODkgODk1LjQzNSwxNzQuNCA4ODkuMDE3LDE3NC40IDg4OS4wMTcsMTU1LjI4OSA4ODEuNjcsMTU1LjI4OSA4ODEuNjcsMTQ5Ljc2OSA5MDIuNzgyLDE0OS43NjkgOTAyLjc4MiwxNTUuMjg5IDkwMi43ODMsMTU1LjI4OSAiIHN0eWxlPSJmaWxsOiNmYWZhZmEiLz4NCg0KCTxwb2x5Z29uIGlkPSJwb2x5Z29uMTMwMyIgcG9pbnRzPSI5MTkuNDExLDE2Ni4xOSA5MjMuNjU0LDE0OS43NjkgOTMzLjEwNywxNDkuNzY5IDkzMy4xMDcsMTc0LjQgOTI3LjA2OSwxNzQuNCA5MjcuMDY5LDE1NS43MDMgOTI3LjAwMSwxNTUuNzAzIDkyMS44MjYsMTc0LjQgOTE2LjkyOSwxNzQuNCA5MTEuNzUyLDE1NS43MDMgOTExLjY4MywxNTUuNzAzIDkxMS42ODMsMTc0LjQgOTA1LjY0NywxNzQuNCA5MDUuNjQ3LDE0OS43NjkgOTE1LjEsMTQ5Ljc2OSA5MTkuMzQyLDE2Ni4xOSAiIHN0eWxlPSJmaWxsOiNmYWZhZmEiLz4NCg0KPC9nPg0KICAgIDwvZz4NCiAgPC9nPg0KPC9zdmc+DQo=";
 
 /***/ }),
 
@@ -70789,6 +70866,7 @@ Inspector.prototype = {
     });
     _lib_Events__WEBPACK_IMPORTED_MODULE_1__["default"].on('entitycreate', definition => {
       (0,_lib_entity__WEBPACK_IMPORTED_MODULE_7__.createEntity)(definition, entity => {
+        entity.pause();
         this.selectEntity(entity);
       });
     });
@@ -70862,7 +70940,6 @@ Inspector.prototype = {
   },
   /**
    * Closes the editor and gives the control back to the scene
-   * @return {[type]} [description]
    */
   close: function () {
     this.opened = false;
